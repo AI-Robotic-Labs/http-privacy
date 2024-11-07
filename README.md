@@ -1,4 +1,4 @@
-# HTTP Privacy
+# HTTP Privacy 🕸️
 
 HTTP and AI for privacy APIs
 
