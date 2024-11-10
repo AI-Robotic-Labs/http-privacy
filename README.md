@@ -2,6 +2,8 @@
 
 HTTP and AI for privacy APIs
 
+You can use OpenAI API and others for get privacy using HTTP
+
 ## Roadmap
 
 - [ ] Lib.rs
