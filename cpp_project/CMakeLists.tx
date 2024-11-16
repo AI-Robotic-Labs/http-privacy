@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.15)
+project(PrivacyHttpSdk)
+
+# Add Rust shared library
+set(RUST_LIB_PATH "../privacy_http_sdk/target/release")
+set(RUST_LIB "${RUST_LIB_PATH}/libprivacy_http_sdk.so") # Adjust extension based on OS
+
+# Add include path for cxx auto-generated headers
+include_directories("../privacy_http_sdk/src")
+
+# Specify the C++ source file
+add_executable(http_client main.cpp)
+
+# Link the Rust library
+target_link_libraries(http_client "${RUST_LIB}")
