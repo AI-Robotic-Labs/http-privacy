@@ -9,8 +9,8 @@ mod ffi {
         type HttpClient;
 
         fn new_http_client() -> Box<HttpClient>;
-        fn get(&self, url: &str, headers: HashMap<String, String>) -> Result<String, String>;
-        fn post(&self, url: &str, headers: HashMap<String, String>, body: String) -> Result<String, String>;
+        fn get(self: &HttpClient, url: &str, headers: &CxxMap<CxxString, CxxString>) -> Result<String, String>;
+        fn post(self: &HttpClient, url: &str, headers: &CxxMap<CxxString, CxxString>, body: &CxxString) -> Result<String, String>;
     }
 }
 
