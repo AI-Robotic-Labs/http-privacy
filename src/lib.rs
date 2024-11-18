@@ -5,12 +5,16 @@ use tokio::runtime::Runtime;
 
 #[cxx::bridge]
 mod ffi {
-    extern "Rust" {
+    extern "C++" {
         type HttpClient;
-
+        /// Creates a new instance of the HTTP client.
         fn new_http_client() -> Box<HttpClient>;
-        fn get(self: &HttpClient, url: &str, headers: &CxxMap<CxxString, CxxString>) -> Result<String, String>;
-        fn post(self: &HttpClient, url: &str, headers: &CxxMap<CxxString, CxxString>, body: &CxxString) -> Result<String, String>;
+
+        /// Sends a GET request to the specified URL with headers.
+        fn get(&self, url: &str, headers: &[(String, String)]) -> Result<String, String>;
+
+        /// Sends a POST request to the specified URL with headers and a body.
+        fn post(&self, url: &str, headers: &[(String, String)], body: &str) -> Result<String, String>;
     }
 }
 
@@ -49,8 +53,8 @@ impl HttpClient {
         self.runtime.block_on(async {
             req.send()
                 .await
-                .and_then(|res| res.text().await)
+                .and_then(|res| async move { res.text().await })
+                .await
                 .map_err(|e| e.to_string())
         })
-    }
-}
+    }}
