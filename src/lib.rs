@@ -5,16 +5,15 @@ use tokio::runtime::Runtime;
 
 #[cxx::bridge]
 mod ffi {
-    extern "C++" {
+    extern "Rust" {
         type HttpClient;
         /// Creates a new instance of the HTTP client.
         fn new_http_client() -> Box<HttpClient>;
 
-        /// Sends a GET request to the specified URL with headers.
-        fn get(&self, url: &str, headers: &[(String, String)]) -> Result<String, String>;
+        fn get(self: &HttpClient, url: &str, headers: &[(&str, &str)]) -> Result<String>;
 
         /// Sends a POST request to the specified URL with headers and a body.
-        fn post(&self, url: &str, headers: &[(String, String)], body: &str) -> Result<String, String>;
+        fn post(self: &HttpClient, url: &str, headers: &[(&str, &str)], body: &str) -> Result<String>;
     }
 }
 
@@ -39,11 +38,11 @@ impl HttpClient {
         self.runtime.block_on(async {
             req.send()
                 .await
-                .and_then(|res| res.text().await)
+                .and_then(|res| async move { res.text().await })
+                .await
                 .map_err(|e| e.to_string())
         })
     }
-
     pub fn post(&self, url: &str, headers: HashMap<String, String>, body: String) -> Result<String, String> {
         let mut req = self.client.post(url).body(body);
         for (key, value) in headers {
@@ -53,7 +52,7 @@ impl HttpClient {
         self.runtime.block_on(async {
             req.send()
                 .await
-                .and_then(|res| async move { res.text().await })
+                .and_then(|res| res.text())
                 .await
                 .map_err(|e| e.to_string())
         })
