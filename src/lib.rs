@@ -46,8 +46,7 @@ impl HttpClient {
         self.runtime.block_on(async {
             req.send()
                 .await
-                .and_then(|res| async move { res.text().await })
-                .await
+                .and_then(|res| res.text().await)
                 .map_err(|e| e.to_string())
         })
     }
@@ -60,7 +59,7 @@ impl HttpClient {
         self.runtime.block_on(async {
             req.send()
                 .await
-                .and_then(|res| async move { res.text().await })
+                .and_then(|res| Ok(async move { res.text()}))
                 
                 .map_err(|e| e.to_string())
         })
