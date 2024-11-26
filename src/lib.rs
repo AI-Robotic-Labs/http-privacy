@@ -51,7 +51,8 @@ impl HttpClient {
         })
     }
 
-    pub fn post(&self, url: &str, headers: HashMap<String, String>, body: String) -> Result<String, String> {        let mut req = self.client.post(url).body(body);
+    pub fn post(&self, url: &str, headers: HashMap<String, String>, body: String) -> Result<String, String> {
+        let mut req = self.client.post(url).body(body);
         for (key, value) in headers {
             req = req.header(&key, &value);
         }
@@ -59,8 +60,8 @@ impl HttpClient {
         self.runtime.block_on(async {
             req.send()
                 .await
-                .and_then(|res| Ok(async move { res.text()}))
-                
+                .and_then(|res| res.text().await)
                 .map_err(|e| e.to_string())
         })
-    }}
+    }
+}
