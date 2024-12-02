@@ -1,5 +1,5 @@
-use std::{collections::HashMap};
-use serde_json::json_internals::json;
+use std::collections::HashMap;
+use serde_json::json;
 use reqwest::Client;
 use tokio::runtime::Runtime;
 
