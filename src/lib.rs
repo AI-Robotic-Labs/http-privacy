@@ -1,67 +1,56 @@
-use std::collections::HashMap;
-use serde_json::json;
 use reqwest::Client;
 use tokio::runtime::Runtime;
+use core::result::Result;
 
-#[cxx::bridge]
-mod ffi {
-    extern "Rust" {
-        type HttpClient;
-        /// Creates a new instance of the HTTP client.
-        fn new_http_client() -> Box<HttpClient>;
-
-        fn get(self: &HttpClient, url: &str, headers: &[(&str, &str)]) -> Result<String, String>;
-
-        /// Sends a POST request to the specified URL with headers and a body.
-        fn post(self: &HttpClient, url: &str, headers: &[(&str, &str)], body: &str) -> Result<String, String>;
-    }
-}
 pub struct HttpClient {
     client: Client,
     runtime: Runtime,
-    headers: HashMap<String, String>,
-    http_client: reqwest::Client,
-    api_key: String,
 }
 
 impl HttpClient {
+    /// Creates a new instance of `HttpClient`.
     pub fn new_http_client() -> Box<Self> {
         let client = Client::new();
         let runtime = Runtime::new().unwrap();
         Box::new(Self {
             client,
             runtime,
-            headers: HashMap::new(),
-            http_client: Client::new(),
-            api_key: String::new(),
         })
     }
 
-    pub fn get(&self, url: &str, headers: HashMap<String, String>) -> Result<String, String> {
+    /// Asynchronously sends a GET request to the specified URL with headers.
+    async fn get(&self, url: &str, headers: &[(&str, &str)]) -> Result<String, String> {
         let mut req = self.client.get(url);
-        for (key, value) in headers {
-            req = req.header(&key, &value);
+        for &(key, value) in headers {
+            req = req.header(key, value);
         }
 
-        self.runtime.block_on(async {
-            req.send()
-                .await
-                .and_then(|res| res.text().await)
-                .map_err(|e| e.to_string())
-        })
+        // Send the request and handle errors more explicitly
+        let response = req.send().await.map_err(|e| format!("Request failed: {}", e))?;
+        let text = response.text().await.map_err(|e| format!("Failed to parse response body: {}", e))?;
+        Ok(text)
     }
 
-    pub fn post(&self, url: &str, headers: HashMap<String, String>, body: String) -> Result<String, String> {
+    /// Asynchronously sends a POST request to the specified URL with headers and a body.
+    async fn post(&self, url: &str, headers: &[(&str, &str)], body: String) -> Result<String, String> {
         let mut req = self.client.post(url).body(body);
-        for (key, value) in headers {
-            req = req.header(&key, &value);
+        for &(key, value) in headers {
+            req = req.header(key, value);
         }
 
-        self.runtime.block_on(async {
-            req.send()
-                .await
-                .and_then(|res| res.text().await)
-                .map_err(|e| e.to_string())
-        })
+        // Send the request and handle errors more explicitly
+        let response = req.send().await.map_err(|e| format!("Request failed: {}", e))?;
+        let text = response.text().await.map_err(|e| format!("Failed to parse response body: {}", e))?;
+        Ok(text)
+    }
+
+    /// Synchronous wrapper for the `get` method for FFI.
+    pub fn get_sync(&self, url: &str, headers: &[(&str, &str)]) -> Result<String, String> {
+        self.runtime.block_on(self.get(url, headers))
+    }
+
+    /// Synchronous wrapper for the `post` method for FFI.
+    pub fn post_sync(&self, url: &str, headers: &[(&str, &str)], body: String) -> Result<String, String> {
+        self.runtime.block_on(self.post(url, headers, body))
     }
 }
