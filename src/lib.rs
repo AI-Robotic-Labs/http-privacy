@@ -1,12 +1,17 @@
 use reqwest::Client;
 use tokio::runtime::Runtime;
 use core::result::Result;
-
+use openai::ApiResponse;
 pub struct HttpClient {
     client: Client,
     runtime: Runtime,
+    #[allow(dead_code)]
+    api_key: String,
+    #[allow(dead_code)]
+    openai_url: String,
+    #[allow(dead_code)]
+    openai_ai_response: ApiResponse<String>,
 }
-
 impl HttpClient {
     /// Creates a new instance of `HttpClient`.
     pub fn new_http_client() -> Box<Self> {
@@ -15,6 +20,9 @@ impl HttpClient {
         Box::new(Self {
             client,
             runtime,
+            api_key: String::new(),
+            openai_url: String::new(),
+            openai_ai_response: ApiResponse::Ok(String::new()),
         })
     }
 
