@@ -9,6 +9,6 @@ You can use OpenAI API and others for get privacy using HTTP
 - [x] Lib.rs
 - [x] C++ support
 - [x] Crates
-- [ ] Fix bugs and issues
-- [ ] Add OpenAI API
+- [x] Fix bugs and issues
+- [x] Add OpenAI API
 - [ ] Release in 2025
