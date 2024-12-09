@@ -1,5 +1,9 @@
 # HTTP Privacy 🕸️
 
+**Beta Version**
+
+**Use with caution**
+
 HTTP and AI for privacy APIs
 
 You can use OpenAI API and others for get privacy using HTTP
