@@ -1,7 +1,8 @@
 use reqwest::Client;
 use tokio::runtime::Runtime;
 use core::result::Result;
-use openai::ApiResponse;
+use rig::providers::openai::ApiResponse;
+
 pub struct HttpClient {
     client: Client,
     runtime: Runtime,
@@ -9,6 +10,8 @@ pub struct HttpClient {
     api_key: String,
     #[allow(dead_code)]
     openai_url: String,
+    #[allow(dead_code)]
+    gpt4: bool,
     #[allow(dead_code)]
     openai_ai_response: ApiResponse<String>,
 }
@@ -23,6 +26,7 @@ impl HttpClient {
             api_key: String::new(),
             openai_url: String::new(),
             openai_ai_response: ApiResponse::Ok(String::new()),
+            gpt4: false,
         })
     }
 
