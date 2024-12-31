@@ -12,7 +12,7 @@ You can use OpenAI API and others for get privacy using HTTP
 - [x] C++ support
 - [x] Crates
 - [x] Fix bugs and issues
-- [x] Add OpenAI API
+- [x] OpenAI API
 - [ ] Gemini API
 - [ ] GPT-4 API
 - [ ] Amazon API
