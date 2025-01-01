@@ -16,4 +16,4 @@ You can use OpenAI API and others for get privacy using HTTP
 - [ ] Gemini API
 - [ ] GPT-4 API
 - [ ] Amazon API
-- [ ] Release in 2025
+- [ ] Release in 2025 and open source 
