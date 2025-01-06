@@ -4,7 +4,7 @@
 
 HTTP and AI for privacy APIs
 
-You can use OpenAI API and others for get privacy using HTTP
+You can use OpenAI API and others for get privacy using HTTP (REST/GET)
 
 ## Roadmap
 
