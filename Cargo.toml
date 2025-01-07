@@ -4,16 +4,16 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
-reqwest = { version = "0.12", features = ["json", "native-tls"] }
-serde = { version = "1.0.216", features = ["derive"] }
-serde_json = "1.0.133"
+reqwest = { version = "0.12.12", features = ["json", "native-tls"] }
+serde = { version = "1.0.217", features = ["derive"] }
+serde_json = "1.0.135"
 tokio = { version = "1", features = ["full"] }
-cxx = "1.0.135"
-openai = "1.0.0-alpha.17"
+cxx = "1.0.136"
+openai = "1.0.0-alpha.18"
 rig-core = "0.6.0"
 
 [build-dependencies]
-cxx-build = "1.0.135"
+cxx-build = "1.0.136"
 
 [lib]
 # Make this library compatible with C++
