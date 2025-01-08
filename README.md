@@ -16,4 +16,5 @@ You can use OpenAI API and others for get privacy using HTTP (REST/GET)
 - [ ] Gemini API
 - [ ] GPT-4 API
 - [ ] Amazon API
+- [ ] JS, Python bindings
 - [ ] Release in 2025 and open source 
