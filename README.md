@@ -1,6 +1,6 @@
 # HTTP Privacy 🕸️
 
-**Beta Version, usse with caution for production**
+**Beta Version, use with caution for production**
 
 HTTP and AI for privacy APIs
 
