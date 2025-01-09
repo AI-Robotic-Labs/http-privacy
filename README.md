@@ -1,5 +1,7 @@
 # HTTP Privacy 🕸️
 
+[![crates.io](https://img.shields.io/crates/v/privacy_http_sdk)](https://crates.io/crates/privacy_http_sdk)
+
 **Beta Version, use with caution for production**
 
 HTTP and AI for privacy APIs
