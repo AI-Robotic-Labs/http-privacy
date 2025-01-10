@@ -1,6 +1,6 @@
 [package]
 name = "privacy_http_sdk"
-version = "0.1.0"
+version = "1.0.0-beta"
 edition = "2018"
 
 [dependencies]
