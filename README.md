@@ -10,13 +10,12 @@ You can use OpenAI API and others for get privacy using HTTP (REST/GET)
 
 ## Roadmap
 
+- [x] Release in 2025 and open source 
 - [x] Lib.rs
 - [x] C++ support
-- [x] Crates
 - [x] Fix bugs and issues
 - [x] OpenAI API
 - [ ] Gemini API
 - [ ] GPT-4 API
 - [ ] Amazon API
 - [ ] JS, Python bindings
-- [ ] Release in 2025 and open source 
