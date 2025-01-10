@@ -1,5 +1,9 @@
 [package]
 name = "privacy_http_sdk"
+description = "Privacy HTTP SDK"
+homepage = "https://github.com/AI-Robotic-Labs/http-privacy"
+documentation = "https://docs.rs/privacy_http_sdk"
+license = "MIT"
 version = "1.0.0-beta"
 edition = "2018"
 
