@@ -12,6 +12,7 @@ int main() {
     // Perform a GET request
     try {
         auto response = client->get("https://api.openai.com/v1/models", headers);
+        auto reposone = client->get("https://api.gemini.com/v1/models", headers);
         std::cout << "GET Response: " << response << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "GET Error: " << e.what() << std::endl;

@@ -1,7 +1,7 @@
 use reqwest::Client;
 use tokio::runtime::Runtime;
 use core::result::Result;
-
+use gemini_client_rs::GeminiClient;
 pub struct HttpClient {
     client: Client,
     runtime: Runtime,
@@ -19,23 +19,25 @@ pub struct HttpClient {
     completion_tokens: usize,
     #[allow(dead_code)]
     total_tokens: usize,
-    
+    #[allow(dead_code)]
+    gemini_client: GeminiClient,
 }
 impl HttpClient {
     /// Creates a new instance of `HttpClient`.
-    pub fn new_http_client() -> Box<Self> {
+    pub fn new_http_client(api_key: String) -> Box<Self> {
         let client = Client::new();
         let runtime = Runtime::new().unwrap();
         Box::new(Self {
             client,
             runtime,
-            api_key: String::new(),
+            api_key: api_key.clone(),
             openai_url: String::new(),
             gpt4: false,
             headers: Vec::new(),
             propmt_tokens: 0,
             completion_tokens: 0,
             total_tokens: 0,
+            gemini_client: GeminiClient::new(api_key),
         })
     }
 
