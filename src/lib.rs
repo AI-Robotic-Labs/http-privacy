@@ -2,6 +2,7 @@ use reqwest::Client;
 use tokio::runtime::Runtime;
 use core::result::Result;
 use gemini_client_rs::GeminiClient;
+use wasm_bindgen::prelude::*;
 pub struct HttpClient {
     client: Client,
     runtime: Runtime,
@@ -21,6 +22,11 @@ pub struct HttpClient {
     total_tokens: usize,
     #[allow(dead_code)]
     gemini_client: GeminiClient,
+}
+
+#[wasm_bindgen]
+pub fn greet(name: &str) -> String {
+    format!("Hello, {}!", name)
 }
 impl HttpClient {
     /// Creates a new instance of `HttpClient`.

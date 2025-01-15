@@ -16,6 +16,7 @@ cxx = "1.0.136"
 openai = "1.0.0-alpha.18"
 rig-core = "0.6.0"
 gemini_client_rs = "0.2.0"
+wasm-bindgen = "0.2.100"
 
 [build-dependencies]
 cxx-build = "1.0.136"
