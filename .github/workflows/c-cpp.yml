@@ -13,11 +13,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4  # Checkout the main repository
 
-    # Checkout the privacy_http_sdk submodule if it's a separate repository
-    # Uncomment the next line if your privacy_http_sdk is a submodule
-    # - name: Checkout privacy_http_sdk submodule
-    #   run: git submodule update --init --recursive
-
     # Install dependencies including Rust, CMake, and build-essential
     - name: Install dependencies
       run: |
@@ -29,16 +24,14 @@ jobs:
     - name: Set up Rust
       run: source $HOME/.cargo/env
 
-    # Build Rust library (fix the path to the privacy_http_sdk)
+    # Build the Rust library (assuming it's in the current directory)
     - name: Build Rust library
       run: |
-        cd privacy_http_sdk  # Adjust the path depending on the relative location
         cargo build --release  # Build the Rust shared library
 
-    # Build the C++ project using CMake
+    # Build the C++ project using CMake (assuming the C++ files are in the root)
     - name: Build C++ project
       run: |
-        cd path_to_your_cpp_project  # Navigate to your C++ project directory
         cmake .
         make
 
