@@ -1,0 +1,12 @@
+.env
+.github/
+docs/
+.renovate.json
+target/
+Cargo.lock
+Cargo.toml
+*.so
+*.dll
+*.dylib
+requirements.txt
+app.py
