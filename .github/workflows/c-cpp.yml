@@ -29,9 +29,10 @@ jobs:
       run: |
         cargo build --release  # Build the Rust shared library
 
-    # Build the C++ project using CMake (assuming the C++ files are in the root)
+    # Build the C++ project using CMake (with CMakeLists.txt located in the `src` folder)
     - name: Build C++ project
       run: |
+        cd http-c++  # Change to the directory containing CMakeLists.txt
         cmake .
         make
 
