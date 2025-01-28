@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: C/C++ CI with Rust Library
 
 on:
   push:
@@ -8,16 +8,39 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: configure
-      run: ./configure
-    - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
+    - uses: actions/checkout@v4  # Checkout code from repository
+
+    # Install dependencies including Rust, CMake, and build-essential
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libclang-dev
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y  # Install Rust
+
+    # Set up Rust environment
+    - name: Set up Rust
+      run: source $HOME/.cargo/env
+
+    # Build Rust library
+    - name: Build Rust library
+      run: |
+        cd ../privacy_http_sdk
+        cargo build --release  # Build the Rust shared library
+
+    # Build the C++ project using CMake
+    - name: Build C++ project
+      run: |
+        cd path_to_your_cpp_project  # Navigate to your C++ project directory
+        cmake .
+        make
+
+    # Run any tests (optional, depending on your project setup)
+    - name: Run tests (if any)
+      run: make test  # You may replace this with your own test command
+
+    # Run any additional checks (optional)
+    - name: Run make distcheck (optional)
       run: make distcheck

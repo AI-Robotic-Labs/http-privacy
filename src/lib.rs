@@ -3,6 +3,7 @@ use tokio::runtime::Runtime;
 use core::result::Result;
 use gemini_client_rs::GeminiClient;
 use wasm_bindgen::prelude::*;
+use pyo3::prelude::*;
 pub struct HttpClient {
     client: Client,
     runtime: Runtime,
@@ -27,6 +28,13 @@ pub struct HttpClient {
 #[wasm_bindgen]
 pub fn greet(name: &str) -> String {
     format!("Hello, {}!", name)
+}
+#[pyclass]
+pub struct HttpClientPy {
+    #[pyo3(get, set)]
+    api_key: String,
+    #[pyo3(get, set)]
+    openai_url: String
 }
 impl HttpClient {
     /// Creates a new instance of `HttpClient`.
