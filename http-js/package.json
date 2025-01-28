@@ -1,0 +1,23 @@
+{
+  "name": "http-privacy-js",
+  "version": "1.0.0",
+  "description": "HTTP Privacy JS Bindings",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AI-Robotic-Labs/http-privacy.git"
+  },
+  "keywords": [
+    "ai",
+    "api"
+  ],
+  "author": "AI & Robotic Labs",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AI-Robotic-Labs/http-privacy/issues"
+  },
+  "homepage": "https://github.com/AI-Robotic-Labs/http-privacy#readme"
+}
