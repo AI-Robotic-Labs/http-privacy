@@ -16,6 +16,6 @@ You can use OpenAI API and others for get privacy using HTTP (REST/GET)
 - [x] Fix bugs and issues
 - [x] OpenAI API
 - [x] Gemini API
+- [x] JS, Python bindings
 - [ ] Deep Seek API
 - [ ] Amazon API
-- [ ] JS, Python bindings
