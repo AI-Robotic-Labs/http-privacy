@@ -13,3 +13,5 @@ app.py
 lib.rs
 main.cpp
 CMMakeLists.tx
+node_modules/
+packge-lock.json
