@@ -12,9 +12,7 @@ requirements.txt
 app.py
 lib.rs
 main.cpp
-http-c+/CMakeLists.tx/
+CMakeLists.txt
 node_modules/
 packge-lock.json
-.vscode/settings.json/
-.vscode/launch.json7
-.vscode/c_cpp_properties.json/
+.vscode/
