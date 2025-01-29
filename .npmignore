@@ -10,3 +10,6 @@ Cargo.toml
 *.dylib
 requirements.txt
 app.py
+lib.rs
+main.cpp
+CMMakeLists.tx
