@@ -13,6 +13,7 @@ app.py
 lib.rs
 main.cpp
 CMakeLists.txt
+CMakeLists.tx
 node_modules/
 packge-lock.json
 .vscode/
