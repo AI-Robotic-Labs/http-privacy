@@ -1,0 +1,23 @@
+[project]
+name = "http-privacy-sdk"
+version = "1.0.0-beta"
+authors = [
+  { name="AI & Robotic Labs" },
+]
+description = "HTT privacy SDK for Python"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.scripts]
+my-app = "app:main"  # If `app.py` has a `main()` function
+
+
+[project.urls]
+Homepage = "https://github.com/AI-Robotic-Labs/http-privacy"
+Issues = "https://github.com/AI-Robotic-Labs/http-privacy/issues"
