@@ -6,6 +6,19 @@ import subprocess
 
 app = Flask(__name__)
 
+# Main route to handle incoming messages
+def main():
+    print("Hello, World!")
+    return 0
+
+@app.route('/', methods=['POST'])
+def handle_message():
+    # Extract input data
+    input_data = request.get_json()
+    if not input_data or 'message' not in input_data:
+        return jsonify({'error': 'Invalid input data'}), 400
+    message = input_data['message']
+    return jsonify({'message': message}), 200
 # Helper function to call the WASM module
 def process_message(input_data):
     try:
