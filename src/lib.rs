@@ -23,6 +23,10 @@ pub struct HttpClient {
     total_tokens: usize,
     #[allow(dead_code)]
     gemini_client: GeminiClient,
+    #[allow(dead_code)]
+    deeppseek_client: Client,
+    #[allow(dead_code)]
+    deepseek_api_key: String,
 }
 
 #[wasm_bindgen]
@@ -51,6 +55,8 @@ impl HttpClient {
             propmt_tokens: 0,
             completion_tokens: 0,
             total_tokens: 0,
+            deepseek_api_key: api_key.clone(),
+            deeppseek_client: Client::new(),
             gemini_client: GeminiClient::new(api_key),
         })
     }
