@@ -3,6 +3,7 @@ const helmet = require('helmet');
 const randomUseragent = require('random-useragent');
 const fetch = require('node-fetch');
 const wasmModule = require('./pkg/your_wasm_module');
+const OpenAI = require ('openai');
 
 const app = express();
 const PORT = process.env.PORT || 3000;

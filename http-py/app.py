@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request
 from user_agent import generate_user_agent
 import json
 import subprocess
+from openai import OpenAI
 
 app = Flask(__name__)
 
@@ -64,3 +65,16 @@ def call_ai_api():
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+
+client = OpenAI(api_key="<DeepSeek API Key>", base_url="https://api.deepseek.com")
+
+response = client.chat.completions.create(
+    model="deepseek-chat",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant"},
+        {"role": "user", "content": "Hello"},
+    ],
+    stream=False
+)
+
+print(response.choices[0].message.content)
