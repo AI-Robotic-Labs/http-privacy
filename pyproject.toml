@@ -1,8 +1,12 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "http-privacy-sdk"
 version = "1.0.0-beta"
 authors = [
-  { name="AI & Robotic Labs" },
+  { name = "AI & Robotic Labs" },
 ]
 description = "HTTP privacy SDK for Python"
 readme = "README.md"
@@ -11,12 +15,16 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
-license = "MIT"
-license-files = ["LICEN[CS]E*"]
+license = { file = "LICENSE" }  # Fixed: Use table syntax for license file
+dependencies = [
+    "Flask==3.1.0",
+    "requests==2.32.3",
+    "user_agent==0.1.10",
+    "openai==1.63.2"
+]
 
 [project.scripts]
 my-app = "app:main"  # If `app.py` has a `main()` function
-
 
 [project.urls]
 Homepage = "https://github.com/AI-Robotic-Labs/http-privacy"
