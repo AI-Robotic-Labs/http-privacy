@@ -4,7 +4,7 @@ version = "1.0.0-beta"
 authors = [
   { name="AI & Robotic Labs" },
 ]
-description = "HTT privacy SDK for Python"
+description = "HTTP privacy SDK for Python"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
