@@ -2,7 +2,7 @@
 
 [![crates.io](https://img.shields.io/crates/v/privacy_http_sdk)](https://crates.io/crates/privacy_http_sdk)
 [![NPM version](https://img.shields.io/npm/v/http-privacy-js.svg)](https://npmjs.org/package/http-privacy-js)
-![Python version](https://img.shields.io/pypi.org/project/http-privacy-sdk/)
+![PyPI](https://img.shields.io/pypi/v/http-privacy-sdk)
 
 
 **Beta Version, use with caution for production**
