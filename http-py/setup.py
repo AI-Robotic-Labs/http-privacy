@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="mypackage",
-    version="1.0.1-beta",  # Fixed: Replaced '--' with '-'
+    version="1.0.0b1",  # Fixed: Replaced '--' with '-'
     packages=find_packages(),
     install_requires=[
         "Flask==3.1.0",    # Fixed: Properly formatted as a list of strings
