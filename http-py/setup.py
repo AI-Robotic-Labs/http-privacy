@@ -8,7 +8,7 @@ setup(
         "Flask==3.1.0",    # Fixed: Properly formatted as a list of strings
         "requests==2.32.3",
         "user_agent==0.1.10",
-        "openai==1.63.2"
+        "openai==1.64.0"
     ],
     author="AI & Robotic Labs",  # Fixed: Closed quotation
     description="HTTP Privacy JS Bindings",
