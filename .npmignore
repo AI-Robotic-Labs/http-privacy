@@ -18,3 +18,5 @@ node_modules/
 packge-lock.json
 .vscode/
 renovate.json
+setup.py
+app.py
