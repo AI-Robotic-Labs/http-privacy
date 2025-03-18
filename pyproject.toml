@@ -21,6 +21,7 @@ dependencies = [
     "requests==2.32.3",
     "user_agent==0.1.10",
     "openai==1.66.3"
+    "boto3==1.37.14"
 ]
 
 [project.scripts]
