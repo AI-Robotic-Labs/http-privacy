@@ -4,6 +4,7 @@ from user_agent import generate_user_agent
 import json
 import subprocess
 from openai import OpenAI
+import boto3 
 
 app = Flask(__name__)
 
