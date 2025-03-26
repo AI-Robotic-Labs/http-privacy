@@ -29,6 +29,12 @@ pub struct HttpClient {
     deeppseek_client: Client,
     #[allow(dead_code)]
     deepseek_api_key: String,
+    #[allow(dead_code)]
+    other_client: OtherClient,
+    #[allow(dead_code)]
+    region_provider: RegionProviderChain,
+    #[allow(dead_code)]
+    config: aws_config::meta::Config,
 }
 
 #[wasm_bindgen]
@@ -60,6 +66,10 @@ impl HttpClient {
             deepseek_api_key: api_key.clone(),
             deeppseek_client: Client::new(),
             gemini_client: GeminiClient::new(api_key),
+            other_client: OtherClient::from_conf(aws_config::meta::Config::default()),
+            config: aws_config::meta::Config::default(),
+            region_provider: RegionProviderChain::default_provider(),
+            
         })
     }
 
