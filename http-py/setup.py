@@ -9,7 +9,7 @@ setup(
         "requests==2.32.3",
         "user_agent==0.1.10",
         "openai==1.68.2",
-        "boto3==1.37.20"
+        "boto3==1.37.21"
 
     ],
     author="AI & Robotic Labs",  # Fixed: Closed quotation
