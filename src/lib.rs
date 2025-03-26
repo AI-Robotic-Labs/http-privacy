@@ -4,6 +4,8 @@ use core::result::Result;
 use gemini_client_rs::GeminiClient;
 use wasm_bindgen::prelude::*;
 use pyo3::prelude::*;
+use aws_sdk_s3::Client as OtherClient;
+use aws_config::meta::region::RegionProviderChain;
 pub struct HttpClient {
     client: Client,
     runtime: Runtime,
