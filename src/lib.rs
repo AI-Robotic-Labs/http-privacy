@@ -5,7 +5,7 @@ use gemini_client_rs::GeminiClient;
 use wasm_bindgen::prelude::*;
 use pyo3::prelude::*;
 use aws_sdk_s3::Client as S3Client;
-use aws_config::meta::region::RegionProviderChain;
+use aws_config::{meta::region::RegionProviderChain, Region};
 
 pub struct HttpClient {
     client: Client,
@@ -53,17 +53,24 @@ impl HttpClient {
     /// Creates a new instance of `HttpClient`.
     pub fn new_http_client(api_key: String) -> Box<Self> {
         let runtime = Runtime::new().expect("Failed to create Tokio runtime");
-        
+
         // Block on the async config loading with proper error handling
         let config = runtime.block_on(async {
-            match aws_config::from_env().load().await {
+            let config_result = aws_config::from_env().load().await;
+            match config_result {
                 Ok(config) => config,
                 Err(e) => {
                     eprintln!("Failed to load AWS config: {:?}", e);
-                    aws_config::SdkConfig::builder().build() // Fallback to default config
+                    // Fallback to default config with a default region
+                    aws_config::SdkConfig::builder()
+                        .region(Region::new("us-east-1")) // Set a default region
+                        .build()
                 }
             }
         });
+
+        let region_provider = RegionProviderChain::first_try(Region::new("us-east-1"))
+            .or_default_provider();
 
         Box::new(Self {
             client: Client::new(),
@@ -80,7 +87,7 @@ impl HttpClient {
             gemini_client: GeminiClient::new(api_key),
             s3_client: S3Client::from_conf(config.clone()),
             config,
-            region_provider: RegionProviderChain::default_provider(),
+            region_provider,
         })
     }
 
