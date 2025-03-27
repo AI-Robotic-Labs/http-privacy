@@ -4,72 +4,83 @@ use core::result::Result;
 use gemini_client_rs::GeminiClient;
 use wasm_bindgen::prelude::*;
 use pyo3::prelude::*;
-use aws_sdk_s3::Client as OtherClient;
+use aws_sdk_s3::Client as S3Client;
 use aws_config::meta::region::RegionProviderChain;
+
 pub struct HttpClient {
     client: Client,
     runtime: Runtime,
-    #[allow(dead_code)]
     api_key: String,
-    #[allow(dead_code)]
     openai_url: String,
-    #[allow(dead_code)]
     gpt4: bool,
-    #[allow(dead_code)]
     headers: Vec<(&'static str, &'static str)>,
-    #[allow(dead_code)]
-    propmt_tokens: usize,
-    #[allow(dead_code)]
+    prompt_tokens: usize,
     completion_tokens: usize,
-    #[allow(dead_code)]
     total_tokens: usize,
-    #[allow(dead_code)]
     gemini_client: GeminiClient,
-    #[allow(dead_code)]
-    deeppseek_client: Client,
-    #[allow(dead_code)]
+    deepseek_client: Client,
     deepseek_api_key: String,
-    #[allow(dead_code)]
-    other_client: OtherClient,
-    #[allow(dead_code)]
+    s3_client: S3Client,
     region_provider: RegionProviderChain,
-    #[allow(dead_code)]
-    config: aws_config::meta::Config,
+    config: aws_config::SdkConfig,
 }
 
 #[wasm_bindgen]
 pub fn greet(name: &str) -> String {
     format!("Hello, {}!", name)
 }
+
 #[pyclass]
 pub struct HttpClientPy {
     #[pyo3(get, set)]
     api_key: String,
     #[pyo3(get, set)]
-    openai_url: String
+    openai_url: String,
 }
+
+#[pymethods]
+impl HttpClientPy {
+    #[new]
+    fn new(api_key: String, openai_url: String) -> Self {
+        Self {
+            api_key,
+            openai_url,
+        }
+    }
+}
+
 impl HttpClient {
     /// Creates a new instance of `HttpClient`.
     pub fn new_http_client(api_key: String) -> Box<Self> {
-        let client = Client::new();
-        let runtime = Runtime::new().unwrap();
+        let runtime = Runtime::new().expect("Failed to create Tokio runtime");
+        
+        // Block on the async config loading with proper error handling
+        let config = runtime.block_on(async {
+            match aws_config::from_env().load().await {
+                Ok(config) => config,
+                Err(e) => {
+                    eprintln!("Failed to load AWS config: {:?}", e);
+                    aws_config::SdkConfig::builder().build() // Fallback to default config
+                }
+            }
+        });
+
         Box::new(Self {
-            client,
+            client: Client::new(),
             runtime,
             api_key: api_key.clone(),
             openai_url: String::new(),
             gpt4: false,
             headers: Vec::new(),
-            propmt_tokens: 0,
+            prompt_tokens: 0,
             completion_tokens: 0,
             total_tokens: 0,
             deepseek_api_key: api_key.clone(),
-            deeppseek_client: Client::new(),
+            deepseek_client: Client::new(),
             gemini_client: GeminiClient::new(api_key),
-            other_client: OtherClient::from_conf(aws_config::meta::Config::default()),
-            config: aws_config::meta::Config::default(),
+            s3_client: S3Client::from_conf(config.clone()),
+            config,
             region_provider: RegionProviderChain::default_provider(),
-            
         })
     }
 
@@ -80,9 +91,12 @@ impl HttpClient {
             req = req.header(key, value);
         }
 
-        // Send the request and handle errors more explicitly
-        let response = req.send().await.map_err(|e| format!("Request failed: {}", e))?;
-        let text = response.text().await.map_err(|e| format!("Failed to parse response body: {}", e))?;
+        let response = req.send()
+            .await
+            .map_err(|e| format!("Request failed: {}", e))?;
+        let text = response.text()
+            .await
+            .map_err(|e| format!("Failed to parse response body: {}", e))?;
         Ok(text)
     }
 
@@ -93,9 +107,12 @@ impl HttpClient {
             req = req.header(key, value);
         }
 
-        // Send the request and handle errors more explicitly
-        let response = req.send().await.map_err(|e| format!("Request failed: {}", e))?;
-        let text = response.text().await.map_err(|e| format!("Failed to parse response body: {}", e))?;
+        let response = req.send()
+            .await
+            .map_err(|e| format!("Request failed: {}", e))?;
+        let text = response.text()
+            .await
+            .map_err(|e| format!("Failed to parse response body: {}", e))?;
         Ok(text)
     }
 
