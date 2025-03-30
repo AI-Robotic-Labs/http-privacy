@@ -14,7 +14,7 @@ lib.rs
 main.cpp
 CMakeLists.txt
 CMakeLists.tx
-version.h.in
+version.h.in.cpp
 node_modules/
 packge-lock.json
 .vscode/
