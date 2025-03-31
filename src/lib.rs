@@ -23,6 +23,8 @@ pub struct HttpClient {
     s3_client: S3Client,
     region_provider: RegionProviderChain,
     config: aws_config::SdkConfig,
+    bucket_name: String,
+    bucket_region: String,
 }
 
 #[wasm_bindgen]
@@ -58,7 +60,6 @@ impl HttpClient {
         let config = runtime.block_on(async {
             let config_result = aws_config::from_env().load().await;
             match config_result {
-                Ok(config) => config,
                 Err(e) => {
                     eprintln!("Failed to load AWS config: {:?}", e);
                     // Fallback to default config with a default region
@@ -66,6 +67,7 @@ impl HttpClient {
                         .region(Region::new("us-east-1")) // Set a default region
                         .build()
                 }
+                Ok(config) => config
             }
         });
 
@@ -85,9 +87,11 @@ impl HttpClient {
             deepseek_api_key: api_key.clone(),
             deepseek_client: Client::new(),
             gemini_client: GeminiClient::new(api_key),
-            s3_client: S3Client::from_conf(config.clone()),
+            s3_client: S3Client::new(&config),
             config,
             region_provider,
+            bucket_name: String::new(),
+            bucket_region: String::new(),
         })
     }
 
@@ -106,7 +110,7 @@ impl HttpClient {
             .map_err(|e| format!("Failed to parse response body: {}", e))?;
         Ok(text)
     }
-
+}
     /// Asynchronously sends a POST request to the specified URL with headers and a body.
     async fn post(&self, url: &str, headers: &[(&str, &str)], body: String) -> Result<String, String> {
         let mut req = self.client.post(url).body(body);
@@ -132,4 +136,3 @@ impl HttpClient {
     pub fn post_sync(&self, url: &str, headers: &[(&str, &str)], body: String) -> Result<String, String> {
         self.runtime.block_on(self.post(url, headers, body))
     }
-}
