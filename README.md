@@ -21,4 +21,5 @@ You can use OpenAI API and others for get privacy using HTTP (REST/GET)
 - [ ] Claude API
 - [ ] Llama API
 - [ ] Stable Diffusion API
+- [ ] Model prompt
 
