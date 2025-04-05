@@ -4,130 +4,96 @@ use core::result::Result;
 use gemini_client_rs::GeminiClient;
 use wasm_bindgen::prelude::*;
 use pyo3::prelude::*;
-use aws_sdk_s3::Client as S3Client;
-use aws_config::SdkConfig;
-
-/// Configuration struct for AWS-related settings
-#[derive(Clone)]
-struct AwsConfig {
-    s3_client: S3Client,
-    sdk_config: SdkConfig,
-    bucket_name: String,
-    bucket_region: String,
-}
-/// Main HTTP client struct
 pub struct HttpClient {
     client: Client,
     runtime: Runtime,
+    #[allow(dead_code)]
     api_key: String,
+    #[allow(dead_code)]
     openai_url: String,
+    #[allow(dead_code)]
     gpt4: bool,
+    #[allow(dead_code)]
     headers: Vec<(&'static str, &'static str)>,
-    prompt_tokens: usize,
+    #[allow(dead_code)]
+    propmt_tokens: usize,
+    #[allow(dead_code)]
     completion_tokens: usize,
+    #[allow(dead_code)]
     total_tokens: usize,
+    #[allow(dead_code)]
     gemini_client: GeminiClient,
-    deepseek_client: Client,
+    #[allow(dead_code)]
+    deeppseek_client: Client,
+    #[allow(dead_code)]
     deepseek_api_key: String,
-    aws_config: AwsConfig,
 }
 
 #[wasm_bindgen]
 pub fn greet(name: &str) -> String {
     format!("Hello, {}!", name)
 }
-
 #[pyclass]
 pub struct HttpClientPy {
     #[pyo3(get, set)]
     api_key: String,
     #[pyo3(get, set)]
-    openai_url: String,
+    openai_url: String
 }
-
-#[pymethods]
-impl HttpClientPy {
-    #[new]
-    fn new(api_key: String, openai_url: String) -> Self {
-        Self {
-            api_key,
-            openai_url,
-        }
-    }
-}
-
 impl HttpClient {
     /// Creates a new instance of `HttpClient`.
-    pub fn new(api_key: String) -> Self {
-        let runtime = Runtime::new().expect("Failed to create Tokio runtime");
-        let aws_config = runtime.block_on(Self::load_aws_config());
-
-        Self {
-            client: Client::new(),
+    pub fn new_http_client(api_key: String) -> Box<Self> {
+        let client = Client::new();
+        let runtime = Runtime::new().unwrap();
+        Box::new(Self {
+            client,
             runtime,
             api_key: api_key.clone(),
             openai_url: String::new(),
             gpt4: false,
             headers: Vec::new(),
-            prompt_tokens: 0,
+            propmt_tokens: 0,
             completion_tokens: 0,
             total_tokens: 0,
             deepseek_api_key: api_key.clone(),
-            deepseek_client: Client::new(),
+            deeppseek_client: Client::new(),
             gemini_client: GeminiClient::new(api_key),
-            aws_config,
-        }
+        })
     }
 
-    /// Loads AWS configuration asynchronously
-    async fn load_aws_config() -> AwsConfig {
-        let sdk_config = aws_config::from_env().load().await;
-
-        AwsConfig {
-            s3_client: S3Client::new(&sdk_config),
-            sdk_config,
-            bucket_name: String::new(),
-            bucket_region: String::new(),
-        }
-    }    }
-    /// Asynchronously sends a GET request
+    /// Asynchronously sends a GET request to the specified URL with headers.
     async fn get(&self, url: &str, headers: &[(&str, &str)]) -> Result<String, String> {
         let mut req = self.client.get(url);
         for &(key, value) in headers {
             req = req.header(key, value);
         }
 
-        let response = req
-            .send()
-            .await
-            .map_err(|e| format!("Request failed: {}", e))?;
-        response
-            .text()
-            .await
-            .map_err(|e| format!("Failed to parse response body: {}", e))
-    }    /// Asynchronously sends a POST request
+        // Send the request and handle errors more explicitly
+        let response = req.send().await.map_err(|e| format!("Request failed: {}", e))?;
+        let text = response.text().await.map_err(|e| format!("Failed to parse response body: {}", e))?;
+        Ok(text)
+    }
+
+    /// Asynchronously sends a POST request to the specified URL with headers and a body.
     async fn post(&self, url: &str, headers: &[(&str, &str)], body: String) -> Result<String, String> {
         let mut req = self.client.post(url).body(body);
         for &(key, value) in headers {
             req = req.header(key, value);
         }
 
-        let response = req
-            .send()
-            .await
-            .map_err(|e| format!("Request failed: {}", e))?;
-        response
-            .text()
-            .await
-            .map_err(|e| format!("Failed to parse response body: {}", e))
+        // Send the request and handle errors more explicitly
+        let response = req.send().await.map_err(|e| format!("Request failed: {}", e))?;
+        let text = response.text().await.map_err(|e| format!("Failed to parse response body: {}", e))?;
+        Ok(text)
     }
 
-    /// Synchronous wrapper for GET requests
+    /// Synchronous wrapper for the `get` method for FFI.
     pub fn get_sync(&self, url: &str, headers: &[(&str, &str)]) -> Result<String, String> {
         self.runtime.block_on(self.get(url, headers))
     }
 
-    /// Synchronous wrapper for POST requests
+    /// Synchronous wrapper for the `post` method for FFI.
     pub fn post_sync(&self, url: &str, headers: &[(&str, &str)], body: String) -> Result<String, String> {
         self.runtime.block_on(self.post(url, headers, body))
     }
+}
