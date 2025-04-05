@@ -7,6 +7,7 @@
     "test": "node index.js"
   },
   "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.782.0",
     "express": "^5.0.0",
     "helmet": "^8.1.0",
     "node-fetch": "^3.3.1",

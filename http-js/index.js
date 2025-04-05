@@ -4,6 +4,7 @@ const randomUseragent = require('random-useragent');
 const fetch = require('node-fetch');
 const wasmModule = require('./pkg/your_wasm_module');
 const OpenAI = require ('openai');
+const { BedrockRuntimeClient } = require("@aws-sdk/client-bedrock-runtime");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +21,7 @@ app.get('/api/ai', async (req, res) => {
         // Example AI API request with the custom User-Agent header
         const aiApiUrl = 'https://api.example.com/ai'; // Replace with your AI API URL
         const inputData = { message: "Hello from WASM!" };
+        const client = new BedrockRuntimeClient({ region: "us-east-1" }); // Replace with your region
 
         // Optional: Perform preprocessing or data manipulation using WASM
         const processedData = wasmModule.process_message(JSON.stringify(inputData));
