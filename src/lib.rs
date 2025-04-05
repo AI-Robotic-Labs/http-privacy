@@ -4,6 +4,10 @@ use core::result::Result;
 use gemini_client_rs::GeminiClient;
 use wasm_bindgen::prelude::*;
 use pyo3::prelude::*;
+
+
+#[wasm_bindgen]
+
 pub struct HttpClient {
     client: Client,
     runtime: Runtime,
@@ -27,6 +31,8 @@ pub struct HttpClient {
     deeppseek_client: Client,
     #[allow(dead_code)]
     deepseek_api_key: String,
+    #[allow(dead_code)]
+    s3_client: Client,
 }
 
 #[wasm_bindgen]
@@ -58,9 +64,9 @@ impl HttpClient {
             deepseek_api_key: api_key.clone(),
             deeppseek_client: Client::new(),
             gemini_client: GeminiClient::new(api_key),
+            s3_client: Client::new(),
         })
     }
-
     /// Asynchronously sends a GET request to the specified URL with headers.
     async fn get(&self, url: &str, headers: &[(&str, &str)]) -> Result<String, String> {
         let mut req = self.client.get(url);
