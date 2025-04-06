@@ -33,6 +33,8 @@ pub struct HttpClient {
     deepseek_api_key: String,
     #[allow(dead_code)]
     s3_client: Client,
+    #[allow(dead_code)]
+    xai_api_key: String
 }
 
 #[wasm_bindgen]
@@ -63,11 +65,11 @@ impl HttpClient {
             total_tokens: 0,
             deepseek_api_key: api_key.clone(),
             deeppseek_client: Client::new(),
-            gemini_client: GeminiClient::new(api_key),
+            gemini_client: GeminiClient::new(api_key.clone()),
             s3_client: Client::new(),
+            xai_api_key: api_key,
         })
-    }
-    /// Asynchronously sends a GET request to the specified URL with headers.
+    }    /// Asynchronously sends a GET request to the specified URL with headers.
     async fn get(&self, url: &str, headers: &[(&str, &str)]) -> Result<String, String> {
         let mut req = self.client.get(url);
         for &(key, value) in headers {

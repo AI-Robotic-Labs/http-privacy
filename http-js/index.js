@@ -19,7 +19,9 @@ app.get('/api/ai', async (req, res) => {
         const userAgent = randomUseragent.getRandom();
         
         // Example AI API request with the custom User-Agent header
-        const aiApiUrl = 'https://api.example.com/ai'; // Replace with your AI API URL
+        const aiApiUrl = 'https://api.x.ai/v1'; // Replace with your AI API URL
+        const apiXai = 'https://api.x.ai/v1';
+        const apiOpenai = 'https://api.openai.com/v1';
         const inputData = { message: "Hello from WASM!" };
         const client = new BedrockRuntimeClient({ region: "us-east-1" }); // Replace with your region
 

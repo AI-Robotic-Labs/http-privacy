@@ -10,7 +10,8 @@ app = Flask(__name__)
 
 # Initialize OpenAI client
 client = OpenAI(api_key="<DeepSeek API Key>", base_url="https://api.deepseek.com")
-client = boto3.client(service_name="bedrock-runtime")
+client = boto3.client(service_name="bedrock-runtime", base_url="https://bedrock-runtime.<region>.amazonaws.com")
+client = xai.client(api_key="<XAI API Key>", base_url="https://api.x.ai/v1")
 
 def main():
     print("Hello, World!")
