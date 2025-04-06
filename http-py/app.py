@@ -1,4 +1,5 @@
 import requests
+import os
 from flask import Flask, jsonify, request
 from user_agent import generate_user_agent
 import json
@@ -8,10 +9,16 @@ import boto3
 
 app = Flask(__name__)
 
-# Initialize OpenAI client
-client = OpenAI(api_key="<DeepSeek API Key>", base_url="https://api.deepseek.com")
-client = boto3.client(service_name="bedrock-runtime", base_url="https://bedrock-runtime.<region>.amazonaws.com")
-client = xai.client(api_key="<XAI API Key>", base_url="https://api.x.ai/v1")
+# Initialize clients with proper separation
+openai_client = OpenAI(api_key="<DeepSeek API Key>", base_url="https://api.deepseek.com")
+bedrock_client = boto3.client(
+    service_name="bedrock-runtime",
+    region_name="<region>"  # Replace with actual region
+)
+xai_client = OpenAI(
+    api_key=os.getenv("XAI_API_KEY", "<XAI API Key>"),  # Use env var or fallback to direct key
+    base_url="https://api.x.ai/v1"
+)
 
 def main():
     print("Hello, World!")
@@ -37,9 +44,9 @@ def handle_message():
 def process_message(input_data):
     try:
         wasm_result = subprocess.run(
-            ["wasm-module"], 
-            input=input_data.encode(), 
-            capture_output=True, 
+            ["wasm-module"],
+            input=input_data.encode(),
+            capture_output=True,
             text=True
         )
         return wasm_result.stdout.strip()
@@ -74,12 +81,45 @@ def call_ai_api():
         print(f"Error: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
+@app.route('/xai', methods=['POST'])
+def xai_endpoint():
+    try:
+        input_data = request.get_json()
+        
+        if not input_data or 'message' not in input_data:
+            return jsonify({"error": "Missing 'message' in request body"}), 400
+
+        # Call xAI's API using the OpenAI client
+        completion = xai_client.chat.completions.create(
+            model="grok-2-latest",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are Grok, a chatbot inspired by the Hitchhikers Guide to the Galaxy."
+                },
+                {
+                    "role": "user",
+                    "content": input_data['message']
+                },
+            ],
+        )
+        
+        response = {
+            "message": completion.choices[0].message.content,
+            "model": "grok-2-latest"
+        }
+        return jsonify(response), 200
+        
+    except Exception as e:
+        print(f"Error calling xAI API: {e}")
+        return jsonify({"error": "Failed to process xAI request"}), 500
+
 if __name__ == '__main__':
     # Run Flask app
     app.run(debug=True, port=5000)
     
-    # Example OpenAI API call (this will only run if the app stops)
-    response = client.chat.completions.create(
+    # Example OpenAI API call (note: this won't run as it's after app.run())
+    response = openai_client.chat.completions.create(
         model="deepseek-chat",
         messages=[
             {"role": "system", "content": "You are a helpful assistant"},
@@ -87,4 +127,3 @@ if __name__ == '__main__':
         ],
         stream=False
     )
-    print(response.choices[0].message.content)
