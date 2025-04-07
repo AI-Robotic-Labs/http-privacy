@@ -10,7 +10,7 @@ setup(
         "user_agent==0.1.10",
         "openai==1.70.0",
         "boto3==1.37.28",
-        "google-generativeai==0.8.4 "
+        "google-generativeai==0.8.4"
 
     ],
     author="AI & Robotic Labs",  # Fixed: Closed quotation
