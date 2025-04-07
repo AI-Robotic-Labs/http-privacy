@@ -21,6 +21,7 @@ int main() {
         auto reposone = client->get("https://api.deepseek.com", headers);
         auto reposone = client>get("https://bedrock-runtime.<region>.amazonaws.com")
         auto response = client>get("https://api.x.ai/v1/models")
+        auto response = client>getO("https://api.gemini.google.com")
         std::cout << "GET Response: " << response << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "GET Error: " << e.what() << std::endl;

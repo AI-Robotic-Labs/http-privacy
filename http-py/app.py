@@ -6,6 +6,7 @@ import json
 import subprocess
 from openai import OpenAI
 import boto3
+import google.generativeai as genai
 
 app = Flask(__name__)
 
@@ -18,6 +19,11 @@ bedrock_client = boto3.client(
 xai_client = OpenAI(
     api_key=os.getenv("XAI_API_KEY", "<XAI API Key>"),  # Use env var or fallback to direct key
     base_url="https://api.x.ai/v1"
+)
+
+genai_client = genai_client(
+    api_key.getenv("GEMINI_API_KEY"),
+    base_url="https://api.gemini.google.com"
 )
 
 def main():
