@@ -144,7 +144,7 @@ impl HttpClientPy {
 
     fn get(&self, url: String, headers: Vec<(String, String)>) -> PyResult<String> {
         self.inner
-            .get_sync(&url, JsValue::from_str(&headers).unwrap_or(JsValue::NULL))
+            .get_sync(&url, headers_to_jsvalue(headers))
             .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.as_string().unwrap_or("Unknown error".to_string())))
     }
 
