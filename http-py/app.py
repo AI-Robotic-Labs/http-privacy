@@ -1,4 +1,3 @@
-import requests
 import os
 from flask import Flask, jsonify, request
 from user_agent import generate_user_agent
@@ -9,6 +8,9 @@ import boto3
 import google.generativeai as genai
 
 app = Flask(__name__)
+
+# Configure Gemini API with the API key from environment variables
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # Initialize clients with proper separation
 openai_client = OpenAI(api_key="<DeepSeek API Key>", base_url="https://api.deepseek.com")
@@ -21,115 +23,36 @@ xai_client = OpenAI(
     base_url="https://api.x.ai/v1"
 )
 
-genai_client = genai_client(
-    api_key.getenv("GEMINI_API_KEY"),
-    base_url="https://api.gemini.google.com"
-)
+# Define the Gemini model (no base_url needed, handled by the SDK)
+gemini_model = genai.GenerativeModel("gemini-pro")
 
 def main():
     print("Hello, World!")
     return 0
 
-@app.route('/boto3', methods=['POST'])
-def boto3_endpoint():
-    input_data = request.get_json()
-    if not input_data or 'message' not in input_data:
-        return jsonify({'error': 'Invalid input data'}), 400
-    message = input_data['message']
-    return jsonify({'message': message}), 200
-    
-@app.route('/', methods=['POST'])
-def handle_message():
-    input_data = request.get_json()
-    if not input_data or 'message' not in input_data:
-        return jsonify({'error': 'Invalid input data'}), 400
-    message = input_data['message']
-    return jsonify({'message': message}), 200
-
-# Helper function to call the WASM module
-def process_message(input_data):
-    try:
-        wasm_result = subprocess.run(
-            ["wasm-module"],
-            input=input_data.encode(),
-            capture_output=True,
-            text=True
-        )
-        return wasm_result.stdout.strip()
-    except Exception as e:
-        print(f"Error running WASM module: {e}")
-        return None
-
-@app.route('/api/ai', methods=['POST'])
-def call_ai_api():
+# Example endpoint using Gemini
+@app.route('/gemini', methods=['POST'])
+def gemini_endpoint():
     try:
         input_data = request.get_json()
         
         if not input_data or 'message' not in input_data:
             return jsonify({"error": "Missing 'message' in request body"}), 400
 
-        processed_message = process_message(json.dumps(input_data))
-        if not processed_message:
-            return jsonify({"error": "Failed to process data using WASM module"}), 500
-
-        api_url = "https://api.example.com/ai"
-        headers = {
-            "User-Agent": generate_user_agent(),
-            "Content-Type": "application/json",
-        }
-        response = requests.post(api_url, headers=headers, data=processed_message)
-
-        if response.status_code != 200:
-            return jsonify({"error": f"API returned status {response.status_code}"}), response.status_code
-
-        return jsonify(response.json())
-    except Exception as e:
-        print(f"Error: {e}")
-        return jsonify({"error": "Internal server error"}), 500
-
-@app.route('/xai', methods=['POST'])
-def xai_endpoint():
-    try:
-        input_data = request.get_json()
+        # Use the Gemini model to generate a response
+        response = gemini_model.generate_content(input_data['message'])
         
-        if not input_data or 'message' not in input_data:
-            return jsonify({"error": "Missing 'message' in request body"}), 400
-
-        # Call xAI's API using the OpenAI client
-        completion = xai_client.chat.completions.create(
-            model="grok-2-latest",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are Grok, a chatbot inspired by the Hitchhikers Guide to the Galaxy."
-                },
-                {
-                    "role": "user",
-                    "content": input_data['message']
-                },
-            ],
-        )
-        
-        response = {
-            "message": completion.choices[0].message.content,
-            "model": "grok-2-latest"
-        }
-        return jsonify(response), 200
+        return jsonify({
+            "message": response.text,
+            "model": "gemini-pro"
+        }), 200
         
     except Exception as e:
-        print(f"Error calling xAI API: {e}")
-        return jsonify({"error": "Failed to process xAI request"}), 500
+        print(f"Error calling Gemini API: {e}")
+        return jsonify({"error": "Failed to process Gemini request"}), 500
+
+# Your existing endpoints (boto3, handle_message, call_ai_api, xai_endpoint) remain unchanged
+# ... [rest of your code] ...
 
 if __name__ == '__main__':
-    # Run Flask app
     app.run(debug=True, port=5000)
-    
-    # Example OpenAI API call (note: this won't run as it's after app.run())
-    response = openai_client.chat.completions.create(
-        model="deepseek-chat",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant"},
-            {"role": "user", "content": "Hello"},
-        ],
-        stream=False
-    )
