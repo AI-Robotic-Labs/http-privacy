@@ -5,6 +5,7 @@ const fetch = require('node-fetch');
 const wasmModule = require('./pkg/your_wasm_module');
 const OpenAI = require ('openai');
 const { BedrockRuntimeClient } = require("@aws-sdk/client-bedrock-runtime");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,7 @@ app.get('/api/ai', async (req, res) => {
         const aiApiUrl = 'https://api.x.ai/v1'; // Replace with your AI API URL
         const apiXai = 'https://api.x.ai/v1';
         const apiOpenai = 'https://api.openai.com/v1';
+        const genAI = new GoogleGenerativeAI(process.env.API_KEY);
         const inputData = { message: "Hello from WASM!" };
         const client = new BedrockRuntimeClient({ region: "us-east-1" }); // Replace with your region
 
