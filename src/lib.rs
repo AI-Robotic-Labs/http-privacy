@@ -7,30 +7,31 @@ use wasm_bindgen::prelude::*;
 
 // HttpClient for Rust/WASM usage
 #[wasm_bindgen]
+#[derive(Debug)]
 pub struct HttpClient {
     client: Client,
     runtime: Runtime,
     api_key: String,
     openai_url: String,
     gpt4: bool,
-    headers: Vec<(&'static str, &'static str)>,
-    prompt_tokens: usize, // Fixed typo
+    headers: Vec<(String, String)>, // Changed to owned Strings for flexibility
+    prompt_tokens: usize,
     completion_tokens: usize,
     total_tokens: usize,
+    #[allow(dead_code)]
     gemini_client: GeminiClient,
-    deepseek_client: Client, // Fixed typo
+    deepseek_client: Client,
     deepseek_api_key: String,
     s3_client: Client,
     xai_api_key: String,
 }
-
 #[wasm_bindgen]
 impl HttpClient {
     #[wasm_bindgen(constructor)]
-    pub fn new(api_key: String) -> Box<HttpClient> {
+    pub fn new(api_key: String) -> HttpClient { // Return Self directly
         let client = Client::new();
         let runtime = Runtime::new().expect("Failed to create Tokio runtime");
-        Box::new(Self {
+        HttpClient {
             client,
             runtime,
             api_key: api_key.clone(),
@@ -41,11 +42,10 @@ impl HttpClient {
             completion_tokens: 0,
             total_tokens: 0,
             deepseek_api_key: api_key.clone(),
-            deepseek_client: Client::new(),
             gemini_client: GeminiClient::new(api_key.clone()),
             s3_client: Client::new(),
             xai_api_key: api_key,
-        })
+        }
     }
 
     pub fn get_sync(&self, url: &str, headers: JsValue) -> Result<String, JsValue> {
@@ -64,10 +64,10 @@ impl HttpClient {
 }
 
 impl HttpClient {
-    async fn get(&self, url: &str, headers: &[(&str, &str)]) -> Result<String, String> {
+    async fn get(&self, url: &str, headers: &[(String, String)]) -> Result<String, String> {
         let mut req = self.client.get(url);
-        for &(key, value) in headers {
-            req = req.header(key, value);
+        for (key, value) in headers {
+            req = req.header(key.as_str(), value.as_str());
         }
         let response = req
             .send()
@@ -80,10 +80,10 @@ impl HttpClient {
         Ok(text)
     }
 
-    async fn post(&self, url: &str, headers: &[(&str, &str)], body: String) -> Result<String, String> {
+    async fn post(&self, url: &str, headers: &[(String, String)], body: String) -> Result<String, String> {
         let mut req = self.client.post(url).body(body);
-        for &(key, value) in headers {
-            req = req.header(key, value);
+        for (key, value) in headers {
+            req = req.header(key.as_str(), value.as_str());
         }
         let response = req
             .send()
@@ -96,14 +96,22 @@ impl HttpClient {
         Ok(text)
     }
 
-    fn js_headers_to_vec(headers: JsValue) -> Result<Vec<(&'static str, &'static str)>, JsValue> {
+    fn js_headers_to_vec(headers: JsValue) -> Result<Vec<(String, String)>, JsValue> {
         if headers.is_undefined() || headers.is_null() {
             return Ok(Vec::new());
         }
-        // Placeholder: Implement based on actual JS header format
-        Err(JsValue::from_str(
-            "Header conversion not implemented; pass headers as array of [key, value] pairs",
-        ))
+        // Basic implementation assuming headers as an array of [key, value] pairs
+        let array = js_sys::Array::from(&headers);
+        let mut result = Vec::new();
+        for pair in array.iter() {
+            let pair_array = js_sys::Array::from(&pair);
+            if pair_array.length() >= 2 {
+                let key = pair_array.get(0).as_string().unwrap_or_default();
+                let value = pair_array.get(1).as_string().unwrap_or_default();
+                result.push((key, value));
+            }
+        }
+        Ok(result)
     }
 }
 
@@ -114,7 +122,6 @@ pub fn greet(name: &str) -> String {
 
 // HttpClientPy for Python usage via PyO3
 #[pyclass]
-#[derive(Clone)] // Added for PyO3 compatibility
 pub struct HttpClientPy {
     #[pyo3(get, set)]
     api_key: String,
@@ -122,28 +129,28 @@ pub struct HttpClientPy {
     openai_url: String,
     inner: HttpClient,
 }
+
 #[pymethods]
 impl HttpClientPy {
     #[new]
-    fn new(api_key: String, openai_url: String) -> PyResult<Self> {
+    fn new(api_key: String, openai_url: String) -> Self {
         let inner = HttpClient::new(api_key.clone());
-        Ok(HttpClientPy {
+        HttpClientPy {
             api_key,
             openai_url,
             inner,
-        })
+        }
     }
 
     fn get(&self, url: String, headers: Vec<(String, String)>) -> PyResult<String> {
-        let _headers_ref: Vec<(&str, &str)> = headers.iter().map(|(k, v)| (k.as_str(), v.as_str())).collect();
         self.inner
-            .get_sync(&url, JsValue::NULL) // Simplified for PyO3; headers passed directly
+            .get_sync(&url, JsValue::from_str(&headers).unwrap_or(JsValue::NULL))
             .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.as_string().unwrap_or("Unknown error".to_string())))
     }
+
     fn post(&self, url: String, headers: Vec<(String, String)>, body: String) -> PyResult<String> {
-        let _headers_ref: Vec<(&str, &str)> = headers.iter().map(|(k, v)| (k.as_str(), v.as_str())).collect();
         self.inner
-            .post_sync(&url, JsValue::NULL, body) // Simplified for PyO3; headers passed directly
+            .post_sync(&url, JsValue::from_str(&headers).unwrap_or(JsValue::NULL), body)
             .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.as_string().unwrap_or("Unknown error".to_string())))
     }
 
