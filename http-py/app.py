@@ -6,6 +6,7 @@ import subprocess
 from openai import OpenAI
 import boto3
 import google.generativeai as genai
+import requests
 
 app = Flask(__name__)
 
