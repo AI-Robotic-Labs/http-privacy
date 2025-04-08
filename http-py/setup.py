@@ -8,10 +8,11 @@ setup(
         "Flask==3.1.0",    # Fixed: Properly formatted as a list of strings
         "requests==2.32.3",
         "user_agent==0.1.10",
-        "openai==1.70.0",
         "boto3==1.37.28",
-        "google-generativeai==0.8.4",
         "qwen-agent==.0.18"
+        "openai==1.71.0",
+        "boto3==1.37.29",
+        "google-generativeai==0.8.4"
 
     ],
     author="AI & Robotic Labs",  # Fixed: Closed quotation
