@@ -2,7 +2,6 @@ use pyo3::prelude::*;
 use reqwest::Client;
 use tokio::runtime::Runtime;
 use core::result::Result;
-use gemini_client_rs::GeminiClient;
 use wasm_bindgen::prelude::*;
 use pyo3::types::PyModule;
 use pyo3::{Python, PyResult as PyResultType, Bound};
@@ -11,23 +10,37 @@ use pyo3::{Python, PyResult as PyResultType, Bound};
 #[wasm_bindgen]
 #[derive(Debug)]
 pub struct HttpClient {
+    #[allow(dead_code)]
     client: Client,
     runtime: Runtime,
+    #[allow(dead_code)]
     api_key: String,
+    #[allow(dead_code)]
     openai_url: String,
+    #[allow(dead_code)]
     gpt4: bool,
+    #[allow(dead_code)]
     headers: Vec<(String, String)>,
+    #[allow(dead_code)]
     prompt_tokens: usize,
+    #[allow(dead_code)]
     completion_tokens: usize,
+    #[allow(dead_code)]
     total_tokens: usize,
+    #[allow(dead_code)]
     gemini_client: String,
+    #[allow(dead_code)]
     deepseek_client: Client,
+    #[allow(dead_code)]
     qwen_client: Client,
+    #[allow(dead_code)]
     deepseek_api_key: String,
+    #[allow(dead_code)]
     s3_client: Client,
+    #[allow(dead_code)]
     xai_api_key: String,
+    #[allow(dead_code)]
     qwen_api_key: String,
-
 }
 
 #[wasm_bindgen]
@@ -37,6 +50,7 @@ impl HttpClient {
         let client = Client::new();
         let runtime = Runtime::new().expect("Failed to create Tokio runtime");
         let deepseek_client = Client::new();
+        let qwen_client = Client::new();
         
         Self {
             client,
@@ -50,14 +64,13 @@ impl HttpClient {
             total_tokens: 0,
             gemini_client: api_key.clone().to_string(),
             deepseek_client,
-            qwen_api_key,
+            qwen_api_key: api_key.clone(),
             qwen_client,
             deepseek_api_key: api_key.clone(),
             s3_client: Client::new(),
             xai_api_key: api_key,
         }
-    }    pub fn get_sync(&self, url: &str, headers: JsValue) -> Result<String, JsValue> {
-        let headers_vec = Self::js_headers_to_vec(headers)?;
+    }    pub fn get_sync(&self, url: &str, headers: JsValue) -> Result<String, JsValue> {        let headers_vec = Self::js_headers_to_vec(headers)?;
         self.runtime
             .block_on(self.get(url, &headers_vec))
             .map_err(|e| JsValue::from_str(&e))
