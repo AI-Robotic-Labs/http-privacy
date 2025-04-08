@@ -7,6 +7,7 @@ from openai import OpenAI
 import boto3
 import google.generativeai as genai
 import requests
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 app = Flask(__name__)
 
@@ -19,6 +20,11 @@ bedrock_client = boto3.client(
 xai_client = OpenAI(
     api_key=os.getenv("XAI_API_KEY", "<XAI API Key>"),  # Use env var or fallback to direct key
     base_url="https://api.x.ai/v1"
+)
+
+qwen_client = OpenAI(
+    api_key=os.getenv("Qwen_API_KEY"),
+    base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completion"
 )
 
 # Configure Gemini API with the API key from environment variables
