@@ -22,9 +22,12 @@ pub struct HttpClient {
     total_tokens: usize,
     gemini_client: String,
     deepseek_client: Client,
+    qwen_client: Client,
     deepseek_api_key: String,
     s3_client: Client,
     xai_api_key: String,
+    qwen_api_key: String,
+
 }
 
 #[wasm_bindgen]
@@ -47,6 +50,8 @@ impl HttpClient {
             total_tokens: 0,
             gemini_client: api_key.clone().to_string(),
             deepseek_client,
+            qwen_api_key,
+            qwen_client,
             deepseek_api_key: api_key.clone(),
             s3_client: Client::new(),
             xai_api_key: api_key,
