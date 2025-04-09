@@ -7,12 +7,12 @@
     "test": "node index.js"
   },
   "dependencies": {
-    "@aws-sdk/client-bedrock-runtime": "^3.784.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.785.0",
     "@google/generative-ai": "^0.24.0",
     "express": "^5.0.0",
     "helmet": "^8.1.0",
     "node-fetch": "^3.3.1",
-    "openai": "^4.91.1",
+    "openai": "^4.93.0",
     "random-useragent": "^0.5.0"
   },
   "devDependencies": {
