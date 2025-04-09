@@ -9,7 +9,7 @@ setup(
         "requests==2.32.3",
         "user_agent==0.1.10",
         "openai==1.71.0",
-        "boto3==1.37.29",
+        "boto3==1.37.30",
         "google-generativeai==0.8.4"
 
     ],
