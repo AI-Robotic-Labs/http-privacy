@@ -11,7 +11,7 @@ setup(
         "boto3==1.37.28",
         "qwen-agent==.0.18"
         "openai==1.72.0",
-        "boto3==1.37.32",
+        "boto3==1.37.33",
         "google-generativeai==0.8.4"
 
     ],
