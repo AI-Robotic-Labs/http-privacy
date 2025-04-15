@@ -17,9 +17,9 @@ You can use OpenAI API and others for get privacy using HTTP (REST/GET)
 - [x] Nova Pro API
 - [x] Grok API
 - [x] Gemini Node.js and Python bindings
-- [ ] Qwen API
-- [ ] Claude API
-- [ ] Llama API
+- [x] Qwen API
+- [x] Claude API
+- [x] Llama API
 - [ ] Stable Diffusion API
 - [ ] Model prompt
 
