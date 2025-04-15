@@ -4,6 +4,7 @@ from user_agent import generate_user_agent
 import json
 import subprocess
 from openai import OpenAI
+from llama_cpp import Llama
 import boto3
 import google.generativeai as genai
 import requests
@@ -38,6 +39,12 @@ gemini_client = OpenAI(
 
     base_url="https://generativelanguage.googleapis.com"
 )
+
+ollama_client = OpenAI(
+    api_key=os.getenv("Ollama_API_KEY"),
+    base_url="http://localhost:11434"
+)
+
 # Configure Gemini API with the API key from environment variables
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 # Define the Gemini model

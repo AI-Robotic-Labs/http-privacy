@@ -43,6 +43,8 @@ pub struct HttpClient {
     qwen_api_key: String,
     #[allow(dead_code)]
     claude_api_key: String,
+    #[allow(dead_code)]
+    ollama_api_key: String    
 }
 
 #[wasm_bindgen]
@@ -71,10 +73,10 @@ impl HttpClient {
             deepseek_api_key: api_key.clone(),
             s3_client: Client::new(),
             xai_api_key: api_key.clone(),
-            claude_api_key: api_key
+            claude_api_key: api_key.clone(),
+            ollama_api_key: api_key
         }
-    }    pub fn get_sync(&self, url: &str, headers: JsValue) -> Result<String, JsValue> {        let headers_vec = Self::js_headers_to_vec(headers)?;        self.runtime
-            .block_on(self.get(url, &headers_vec))
+    }    pub fn get_sync(&self, url: &str, headers: JsValue) -> Result<String, JsValue> {        let headers_vec = Self::js_headers_to_vec(headers)?;        self.runtime            .block_on(self.get(url, &headers_vec))
             .map_err(|e| JsValue::from_str(&e))
     }
 

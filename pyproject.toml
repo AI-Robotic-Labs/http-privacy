@@ -23,7 +23,8 @@ dependencies = [
     "qwen-agent==0.0.18"
     "openai==1.74.0",
     "boto3==1.37.34",
-    "google-generativeai==0.8.4"
+    "google-generativeai==0.8.4",
+    "llama-cpp-python==0.3.8"
 ]
 
 [project.scripts]
