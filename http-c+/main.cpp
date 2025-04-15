@@ -23,6 +23,7 @@ int main() {
         auto response = client>get("https://api.x.ai/v1/models")
         auto response = client>getO("https://api.gemini.google.com")
         auto response = client>get("https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions")
+        auto response = client>get("https://claude.ai/api/'")
         std::cout << "GET Response: " << response << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "GET Error: " << e.what() << std::endl;

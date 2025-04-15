@@ -25,6 +25,7 @@ app.get('/api/ai', async (req, res) => {
         const apiXai = 'https://api.x.ai/v1';
         const apiOpenai = 'https://api.openai.com/v1';
         const QwenAPI = 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions';
+        const Claude = 'https://claude.ai/api/'
         const genAI = new GoogleGenerativeAI(process.env.API_KEY);
         const inputData = { message: "Hello from WASM!" };
         const client = new BedrockRuntimeClient({ region: "us-east-1" }); // Replace with your region

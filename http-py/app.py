@@ -27,6 +27,17 @@ qwen_client = OpenAI(
     base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completion"
 )
 
+claude_client = OpenAI(
+    api_key=os.getenv("Claude_API_KEY"),
+    
+    base_url="https://api.anthropic.com/v1/complete"
+)
+
+gemini_client = OpenAI(
+    api_key=os.getenv("Gemini_API_KEY"),
+
+    base_url="https://generativelanguage.googleapis.com"
+)
 # Configure Gemini API with the API key from environment variables
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 # Define the Gemini model
