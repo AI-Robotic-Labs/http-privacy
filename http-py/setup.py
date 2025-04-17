@@ -9,11 +9,10 @@ setup(
         "requests==2.32.3",
         "user_agent==0.1.10",
         "qwen-agent==.0.18"
-        "openai==1.72.0",
-        "openai==1.74.0",
-        "boto3==1.37.34",
-        "google-generativeai==0.8.4",
         "llama-cpp-python==0.3.8"
+        "openai==1.75.0",
+        "boto3==1.37.35",
+        "google-generativeai==0.8.5"
 
     ],
     author="AI & Robotic Labs",  # Fixed: Closed quotation
