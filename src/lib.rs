@@ -1,14 +1,16 @@
+use pyo3::prelude::*;
 use reqwest::Client;
 use tokio::runtime::Runtime;
 use core::result::Result;
-use gemini_client_rs::GeminiClient;
 use wasm_bindgen::prelude::*;
-use pyo3::prelude::*;
+use pyo3::types::PyModule;
+use pyo3::{Python, PyResult as PyResultType, Bound};
 
-
+// HttpClient for Rust/WASM usage
 #[wasm_bindgen]
-
+#[derive(Debug)]
 pub struct HttpClient {
+    #[allow(dead_code)]
     client: Client,
     runtime: Runtime,
     #[allow(dead_code)]
@@ -18,90 +20,189 @@ pub struct HttpClient {
     #[allow(dead_code)]
     gpt4: bool,
     #[allow(dead_code)]
-    headers: Vec<(&'static str, &'static str)>,
+    headers: Vec<(String, String)>,
     #[allow(dead_code)]
-    propmt_tokens: usize,
+    prompt_tokens: usize,
     #[allow(dead_code)]
     completion_tokens: usize,
     #[allow(dead_code)]
     total_tokens: usize,
     #[allow(dead_code)]
-    gemini_client: GeminiClient,
+    gemini_client: String,
     #[allow(dead_code)]
-    deeppseek_client: Client,
+    deepseek_client: Client,
+    #[allow(dead_code)]
+    qwen_client: Client,
     #[allow(dead_code)]
     deepseek_api_key: String,
     #[allow(dead_code)]
     s3_client: Client,
     #[allow(dead_code)]
-    xai_api_key: String
+    xai_api_key: String,
+    #[allow(dead_code)]
+    qwen_api_key: String,
+    #[allow(dead_code)]
+    claude_api_key: String,
+    #[allow(dead_code)]
+    ollama_api_key: String    
 }
 
 #[wasm_bindgen]
-pub fn greet(name: &str) -> String {
-    format!("Hello, {}!", name)
-}
-#[pyclass]
-pub struct HttpClientPy {
-    #[pyo3(get, set)]
-    api_key: String,
-    #[pyo3(get, set)]
-    openai_url: String
-}
 impl HttpClient {
-    /// Creates a new instance of `HttpClient`.
-    pub fn new_http_client(api_key: String) -> Box<Self> {
+    #[wasm_bindgen(constructor)]
+    pub fn new(api_key: String) -> Self {
         let client = Client::new();
-        let runtime = Runtime::new().unwrap();
-        Box::new(Self {
+        let runtime = Runtime::new().expect("Failed to create Tokio runtime");
+        let deepseek_client = Client::new();
+        let qwen_client = Client::new();
+        
+        Self {
             client,
             runtime,
             api_key: api_key.clone(),
             openai_url: String::new(),
             gpt4: false,
             headers: Vec::new(),
-            propmt_tokens: 0,
+            prompt_tokens: 0,
             completion_tokens: 0,
             total_tokens: 0,
+            gemini_client: api_key.clone().to_string(),
+            deepseek_client,
+            qwen_api_key: api_key.clone(),
+            qwen_client,
             deepseek_api_key: api_key.clone(),
-            deeppseek_client: Client::new(),
-            gemini_client: GeminiClient::new(api_key.clone()),
             s3_client: Client::new(),
-            xai_api_key: api_key,
-        })
-    }    /// Asynchronously sends a GET request to the specified URL with headers.
-    async fn get(&self, url: &str, headers: &[(&str, &str)]) -> Result<String, String> {
+            xai_api_key: api_key.clone(),
+            claude_api_key: api_key.clone(),
+            ollama_api_key: api_key
+        }
+    }    pub fn get_sync(&self, url: &str, headers: JsValue) -> Result<String, JsValue> {        let headers_vec = Self::js_headers_to_vec(headers)?;        self.runtime            .block_on(self.get(url, &headers_vec))
+            .map_err(|e| JsValue::from_str(&e))
+    }
+
+    pub fn post_sync(&self, url: &str, headers: JsValue, body: String) -> Result<String, JsValue> {
+        let headers_vec = Self::js_headers_to_vec(headers)?;
+        self.runtime
+            .block_on(self.post(url, &headers_vec, body))
+            .map_err(|e| JsValue::from_str(&e))
+    }
+}
+
+impl HttpClient {
+    async fn get(&self, url: &str, headers: &[(String, String)]) -> Result<String, String> {
         let mut req = self.client.get(url);
-        for &(key, value) in headers {
-            req = req.header(key, value);
+        for (key, value) in headers {
+            req = req.header(key.as_str(), value.as_str());
         }
-
-        // Send the request and handle errors more explicitly
-        let response = req.send().await.map_err(|e| format!("Request failed: {}", e))?;
-        let text = response.text().await.map_err(|e| format!("Failed to parse response body: {}", e))?;
+        let response = req
+            .send()
+            .await
+            .map_err(|e| format!("Request failed: {}", e))?;
+        let text = response
+            .text()
+            .await
+            .map_err(|e| format!("Failed to parse response body: {}", e))?;
         Ok(text)
     }
 
-    /// Asynchronously sends a POST request to the specified URL with headers and a body.
-    async fn post(&self, url: &str, headers: &[(&str, &str)], body: String) -> Result<String, String> {
+    async fn post(&self, url: &str, headers: &[(String, String)], body: String) -> Result<String, String> {
         let mut req = self.client.post(url).body(body);
-        for &(key, value) in headers {
-            req = req.header(key, value);
+        for (key, value) in headers {
+            req = req.header(key.as_str(), value.as_str());
         }
-
-        // Send the request and handle errors more explicitly
-        let response = req.send().await.map_err(|e| format!("Request failed: {}", e))?;
-        let text = response.text().await.map_err(|e| format!("Failed to parse response body: {}", e))?;
+        let response = req
+            .send()
+            .await
+            .map_err(|e| format!("Request failed: {}", e))?;
+        let text = response
+            .text()
+            .await
+            .map_err(|e| format!("Failed to parse response body: {}", e))?;
         Ok(text)
     }
 
-    /// Synchronous wrapper for the `get` method for FFI.
-    pub fn get_sync(&self, url: &str, headers: &[(&str, &str)]) -> Result<String, String> {
-        self.runtime.block_on(self.get(url, headers))
+    fn js_headers_to_vec(headers: JsValue) -> Result<Vec<(String, String)>, JsValue> {
+        if headers.is_undefined() || headers.is_null() {
+            return Ok(Vec::new());
+        }
+        let array = js_sys::Array::from(&headers);
+        let mut result = Vec::new();
+        for pair in array.iter() {
+            let pair_array = js_sys::Array::from(&pair);
+            if pair_array.length() >= 2 {
+                let key = pair_array.get(0).as_string().unwrap_or_default();
+                let value = pair_array.get(1).as_string().unwrap_or_default();
+                result.push((key, value));
+            }
+        }
+        Ok(result)
+    }
+}
+
+#[wasm_bindgen]
+pub fn greet(name: &str) -> String {
+    format!("Hello, {}!", name)
+}
+
+// HttpClientPy for Python usage via PyO3
+#[pyclass]
+pub struct HttpClientPy {
+    #[pyo3(get, set)]
+    api_key: String,
+    #[pyo3(get, set)]
+    openai_url: String,
+    inner: HttpClient,
+}
+
+fn headers_to_jsvalue(headers: Vec<(String, String)>) -> JsValue {
+    let array = js_sys::Array::new();
+    for (key, value) in headers {
+        let pair = js_sys::Array::new();
+        pair.push(&JsValue::from_str(&key));
+        pair.push(&JsValue::from_str(&value));
+        array.push(&pair.into());
+    }
+    array.into()
+}
+
+#[pymethods]
+impl HttpClientPy {
+    #[new]
+    fn new(api_key: String, openai_url: String) -> Self {
+        let inner = HttpClient::new(api_key.clone());
+        Self {
+            api_key,
+            openai_url,
+            inner,
+        }
     }
 
-    /// Synchronous wrapper for the `post` method for FFI.
-    pub fn post_sync(&self, url: &str, headers: &[(&str, &str)], body: String) -> Result<String, String> {
-        self.runtime.block_on(self.post(url, headers, body))
+    fn get(&self, url: String, headers: Vec<(String, String)>) -> PyResult<String> {
+        self.inner
+            .get_sync(&url, headers_to_jsvalue(headers))
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(
+                e.as_string().unwrap_or("Unknown error".to_string())
+            ))
     }
+
+    fn post(&self, url: String, headers: Vec<(String, String)>, body: String) -> PyResult<String> {
+        self.inner
+            .post_sync(&url, headers_to_jsvalue(headers), body)
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(
+                e.as_string().unwrap_or("Unknown error".to_string())
+            ))
+    }
+
+    fn __str__(&self) -> String {
+        format!(
+            "HttpClientPy(api_key='{}', openai_url='{}')",
+            self.api_key, self.openai_url
+        )
+    }
+}
+
+#[pymodule]
+fn http_client_module(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResultType<()> {
+    m.add_class::<HttpClientPy>()?;
+    Ok(())
 }
