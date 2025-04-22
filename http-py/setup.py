@@ -8,7 +8,7 @@ setup(
         "Flask==3.1.0",    # Fixed: Properly formatted as a list of strings
         "requests==2.32.3",
         "user_agent==0.1.10",
-        "qwen-agent==.0.18"
+        "qwen-agent==.0.0.19"
         "llama-cpp-python==0.3.8"
         "openai==1.75.0",
         "boto3==1.37.38",
