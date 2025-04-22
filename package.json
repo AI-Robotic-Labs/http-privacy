@@ -9,6 +9,7 @@
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.787.0",
     "@google/generative-ai": "^0.24.0",
+    "axios": "^1.8.4",
     "express": "^5.0.0",
     "helmet": "^8.1.0",
     "node-fetch": "^3.3.1",

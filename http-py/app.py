@@ -4,9 +4,11 @@ from user_agent import generate_user_agent
 import json
 import subprocess
 from openai import OpenAI
+from llama_cpp import Llama
 import boto3
 import google.generativeai as genai
 import requests
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 app = Flask(__name__)
 
@@ -19,6 +21,28 @@ bedrock_client = boto3.client(
 xai_client = OpenAI(
     api_key=os.getenv("XAI_API_KEY", "<XAI API Key>"),  # Use env var or fallback to direct key
     base_url="https://api.x.ai/v1"
+)
+
+qwen_client = OpenAI(
+    api_key=os.getenv("Qwen_API_KEY"),
+    base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completion"
+)
+
+claude_client = OpenAI(
+    api_key=os.getenv("Claude_API_KEY"),
+    
+    base_url="https://api.anthropic.com/v1/complete"
+)
+
+gemini_client = OpenAI(
+    api_key=os.getenv("Gemini_API_KEY"),
+
+    base_url="https://generativelanguage.googleapis.com"
+)
+
+ollama_client = OpenAI(
+    api_key=os.getenv("Ollama_API_KEY"),
+    base_url="http://localhost:11434"
 )
 
 # Configure Gemini API with the API key from environment variables
