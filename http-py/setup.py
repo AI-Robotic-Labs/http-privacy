@@ -10,7 +10,7 @@ setup(
         "user_agent==0.1.10",
         "qwen-agent==.0.0.19"
         "llama-cpp-python==0.3.8"
-        "openai==1.75.0",
+        "openai==1.76.0",
         "boto3==1.38.0",
         "google-generativeai==0.8.5"
 
