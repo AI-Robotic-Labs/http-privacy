@@ -6,7 +6,6 @@ use wasm_bindgen::prelude::*;
 use pyo3::types::PyModule;
 use pyo3::{Python, PyResult as PyResultType, Bound};
 use serde_json::json;
-use base64::encode;
 
 // HttpClient for Rust/WASM usage
 #[wasm_bindgen]
@@ -15,23 +14,37 @@ pub struct HttpClient {
     client: Client,
     runtime: Runtime,
     api_key: String,
+    #[allow(dead_code)]
     openai_url: String,
+    #[allow(dead_code)]
     gpt4: bool,
+    #[allow(dead_code)]
     headers: Vec<(String, String)>,
+    #[allow(dead_code)]
     prompt_tokens: usize,
+    #[allow(dead_code)]
     completion_tokens: usize,
+    #[allow(dead_code)]
     total_tokens: usize,
+    #[allow(dead_code)]
     gemini_client: String,
+    #[allow(dead_code)]
     deepseek_client: Client,
+    #[allow(dead_code)]
     qwen_client: Client,
+    #[allow(dead_code)]
     deepseek_api_key: String,
+    #[allow(dead_code)]
     s3_client: Client,
+    #[allow(dead_code)]
     xai_api_key: String,
+    #[allow(dead_code)]
     qwen_api_key: String,
+    #[allow(dead_code)]
     claude_api_key: String,
+    #[allow(dead_code)]
     ollama_api_key: String,
 }
-
 #[wasm_bindgen]
 impl HttpClient {
     #[wasm_bindgen(constructor)]

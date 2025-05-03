@@ -65,6 +65,7 @@ void start_api_server() {
             int steps = payload["steps"].get<int>();
 
             // Sanitize prompt (basic example)
+            // Sanitize prompt (basic example)
             if (prompt.find("<script") != std::string::npos || prompt.find("..") != std::string::npos) {
                 res.set_content("Invalid prompt", "text/plain");
                 res.status = 400;
