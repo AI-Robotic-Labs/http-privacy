@@ -6,7 +6,7 @@ use wasm_bindgen::prelude::*;
 use pyo3::types::PyModule;
 use pyo3::{Python, PyResult as PyResultType, Bound};
 use serde_json::json;
-
+use base64::Engine;
 // HttpClient for Rust/WASM usage
 #[wasm_bindgen]
 #[derive(Debug)]
@@ -259,14 +259,13 @@ impl HttpClientPy {
             .ok_or_else(|| pyo3::exceptions::PyRuntimeError::new_err("No image data in response"))?;
 
         // Decode base64 and save to file
-        let decoded = base64::decode(image_data)
+        let decoded = base64::engine::general_purpose::STANDARD.decode(image_data)
             .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("Failed to decode image: {}", e)))?;
         std::fs::write(&output_path, decoded)
             .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("Failed to save image: {}", e)))?;
 
         Ok(())
     }
-
     fn __str__(&self) -> String {
         format!(
             "HttpClientPy(api_key='{}', openai_url='{}')",
