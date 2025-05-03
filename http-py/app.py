@@ -9,6 +9,7 @@ import boto3
 import google.generativeai as genai
 import requests
 from transformers import AutoModelForCausalLM, AutoTokenizer
+import HttpClientPy
 
 app = Flask(__name__)
 
@@ -46,7 +47,7 @@ ollama_client = OpenAI(
 )
 
 # Initialize with Stability AI API key
-client = HttpClientPy("your-stability-ai-api-key", "")
+client = HttpClientPy ("your-stability-ai-api-key", "")
 
 # Generate image and save to file
 client.generate_image("A serene landscape", 512, 512, 50, "output.png")
