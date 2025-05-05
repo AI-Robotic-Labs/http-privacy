@@ -21,3 +21,5 @@ packge-lock.json
 renovate.json
 setup.py
 app.py
+setup.sh
+http-run.md
