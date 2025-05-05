@@ -10,6 +10,7 @@ import google.generativeai as genai
 import requests
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import HttpClientPy
+import Prompt
 
 app = Flask(__name__)
 
