@@ -1,6 +1,6 @@
 {
   "name": "http-privacy-js",
-  "version": "1.0.3-beta",
+  "version": "1.0.4-beta",
   "description": "HTTP Privacy JS Bindings",
   "main": "index.js",
   "scripts": {
