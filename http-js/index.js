@@ -27,12 +27,19 @@ app.get('/api/ai', async (req, res) => {
         const QwenAPI = 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions';
         const Claude = 'https://claude.ai/api/';
         const ollama = 'http://localhost:11434/api/generate';
+        const stable = new HttpClient("your-stability-ai-api-key");
+        const imageBase64 = client.generate_image_sync("A serene landscape", 512, 512, 50);
+        document.getElementById("image").src = `data:image/png;base64,${imageBase64}`;
         const genAI = new GoogleGenerativeAI(process.env.API_KEY);
         const inputData = { message: "Hello from WASM!" };
         const client = new BedrockRuntimeClient({ region: "us-east-1" }); // Replace with your region
         // Optional: Perform preprocessing or data manipulation using WASM
         const processedData = wasmModule.process_message(JSON.stringify(inputData));
-
+         
+        // Prompt AI example
+        const Prompt = {
+            prompt: 'prompt text'
+        }
         // Make the HTTP request to the AI API
         const response = await fetch(aiApiUrl, {
             method: 'POST',

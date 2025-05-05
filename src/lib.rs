@@ -5,15 +5,14 @@ use core::result::Result;
 use wasm_bindgen::prelude::*;
 use pyo3::types::PyModule;
 use pyo3::{Python, PyResult as PyResultType, Bound};
-
+use serde_json::json;
+use base64::Engine;
 // HttpClient for Rust/WASM usage
 #[wasm_bindgen]
 #[derive(Debug)]
 pub struct HttpClient {
-    #[allow(dead_code)]
     client: Client,
     runtime: Runtime,
-    #[allow(dead_code)]
     api_key: String,
     #[allow(dead_code)]
     openai_url: String,
@@ -44,18 +43,20 @@ pub struct HttpClient {
     #[allow(dead_code)]
     claude_api_key: String,
     #[allow(dead_code)]
-    ollama_api_key: String    
+    ollama_api_key: String,
 }
-
 #[wasm_bindgen]
 impl HttpClient {
     #[wasm_bindgen(constructor)]
     pub fn new(api_key: String) -> Self {
-        let client = Client::new();
+        let client = Client::builder()
+            .https_only(true) // Enforce HTTPS for privacy
+            .build()
+            .expect("Failed to create reqwest client");
         let runtime = Runtime::new().expect("Failed to create Tokio runtime");
         let deepseek_client = Client::new();
         let qwen_client = Client::new();
-        
+
         Self {
             client,
             runtime,
@@ -66,7 +67,7 @@ impl HttpClient {
             prompt_tokens: 0,
             completion_tokens: 0,
             total_tokens: 0,
-            gemini_client: api_key.clone().to_string(),
+            gemini_client: api_key.clone(),
             deepseek_client,
             qwen_api_key: api_key.clone(),
             qwen_client,
@@ -74,9 +75,14 @@ impl HttpClient {
             s3_client: Client::new(),
             xai_api_key: api_key.clone(),
             claude_api_key: api_key.clone(),
-            ollama_api_key: api_key
+            ollama_api_key: api_key,
         }
-    }    pub fn get_sync(&self, url: &str, headers: JsValue) -> Result<String, JsValue> {        let headers_vec = Self::js_headers_to_vec(headers)?;        self.runtime            .block_on(self.get(url, &headers_vec))
+    }
+
+    pub fn get_sync(&self, url: &str, headers: JsValue) -> Result<String, JsValue> {
+        let headers_vec = Self::js_headers_to_vec(headers)?;
+        self.runtime
+            .block_on(self.get(url, &headers_vec))
             .map_err(|e| JsValue::from_str(&e))
     }
 
@@ -85,6 +91,45 @@ impl HttpClient {
         self.runtime
             .block_on(self.post(url, &headers_vec, body))
             .map_err(|e| JsValue::from_str(&e))
+    }
+
+    // General prompt for AI API
+    pub fn prompt(&self, prompt: &str) -> Result<String, JsValue> {
+        let json_data = json!({
+            "prompt": prompt,
+        });
+        Ok(json_data.to_string())
+    }
+
+    /// Generate an image using Stable Diffusion API (for WASM)
+    pub fn generate_image_sync(&self, prompt: &str, width: u32, height: u32, steps: u32) -> Result<String, JsValue> {
+        let url = "https://api.stability.ai/v1/generation/stable-diffusion-xl-beta-v2-2-2/text-to-image";
+        let headers = js_sys::Array::new();
+        let auth_header = js_sys::Array::new();
+        auth_header.push(&JsValue::from_str("Authorization"));
+        auth_header.push(&JsValue::from_str(&format!("Bearer {}", self.api_key)));
+        headers.push(&auth_header.into());
+        let content_type = js_sys::Array::new();
+        content_type.push(&JsValue::from_str("Content-Type"));
+        content_type.push(&JsValue::from_str("application/json"));
+        headers.push(&content_type.into());
+
+        let body = json!({
+            "prompt": prompt,
+            "width": width,
+            "height": height,
+            "steps": steps
+        })
+        .to_string();
+
+        self.post_sync(url, headers.into(), body)
+            .map(|response| {
+                let json: serde_json::Value = serde_json::from_str(&response).unwrap_or_default();
+                json["artifacts"][0]["binary"]
+                    .as_str()
+                    .map(|s| s.to_string())
+                    .unwrap_or_default()
+            })
     }
 }
 
@@ -193,6 +238,42 @@ impl HttpClientPy {
             ))
     }
 
+    /// Generate an image using Stable Diffusion API and save it to a file (for Python)
+    fn generate_image(&self, prompt: String, width: u32, height: u32, steps: u32, output_path: String) -> PyResult<()> {
+        let url = "https://api.stability.ai/v1/generation/stable-diffusion-xl-beta-v2-2-2/text-to-image";
+        let headers = vec![
+            ("Authorization".to_string(), format!("Bearer {}", self.api_key)),
+            ("Content-Type".to_string(), "application/json".to_string()),
+            ("Cache-Control".to_string(), "no-cache".to_string()),
+        ];
+        let body = json!({
+            "prompt": prompt,
+            "width": width,
+            "height": height,
+            "steps": steps
+        })
+        .to_string();
+
+        let response = self.inner
+            .post_sync(&url, headers_to_jsvalue(headers), body)
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(
+                e.as_string().unwrap_or("Unknown error".to_string())
+            ))?;
+
+        let json: serde_json::Value = serde_json::from_str(&response)
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("Failed to parse response: {}", e)))?;
+        let image_data = json["artifacts"][0]["binary"]
+            .as_str()
+            .ok_or_else(|| pyo3::exceptions::PyRuntimeError::new_err("No image data in response"))?;
+
+        // Decode base64 and save to file
+        let decoded = base64::engine::general_purpose::STANDARD.decode(image_data)
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("Failed to decode image: {}", e)))?;
+        std::fs::write(&output_path, decoded)
+            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("Failed to save image: {}", e)))?;
+
+        Ok(())
+    }
     fn __str__(&self) -> String {
         format!(
             "HttpClientPy(api_key='{}', openai_url='{}')",

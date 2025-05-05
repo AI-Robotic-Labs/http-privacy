@@ -9,6 +9,8 @@ import boto3
 import google.generativeai as genai
 import requests
 from transformers import AutoModelForCausalLM, AutoTokenizer
+import HttpClientPy
+import Prompt
 
 app = Flask(__name__)
 
@@ -45,11 +47,22 @@ ollama_client = OpenAI(
     base_url="http://localhost:11434"
 )
 
+# Initialize with Stability AI API key
+client = HttpClientPy ("your-stability-ai-api-key", "")
+
+# Generate image and save to file
+client.generate_image("A serene landscape", 512, 512, 50, "output.png")
+print("Image saved to output.png")
+
 # Configure Gemini API with the API key from environment variables
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 # Define the Gemini model
 gemini_model = genai.GenerativeModel("gemini-pro")
 
+# Prompt AI example
+Prompt.generate_prompt(
+    prompt="hello world"
+)
 def main():
     print("Hello, World!")
     return 0
