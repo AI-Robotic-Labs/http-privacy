@@ -58,6 +58,10 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 # Define the Gemini model
 gemini_model = genai.GenerativeModel("gemini-pro")
 
+# Prompt AI example
+Prompt.generate_prompt(
+    prompt="hello world"
+)
 def main():
     print("Hello, World!")
     return 0

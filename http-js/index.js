@@ -35,7 +35,11 @@ app.get('/api/ai', async (req, res) => {
         const client = new BedrockRuntimeClient({ region: "us-east-1" }); // Replace with your region
         // Optional: Perform preprocessing or data manipulation using WASM
         const processedData = wasmModule.process_message(JSON.stringify(inputData));
-
+         
+        // Prompt AI example
+        const Prompt = {
+            prompt: 'prompt text'
+        }
         // Make the HTTP request to the AI API
         const response = await fetch(aiApiUrl, {
             method: 'POST',

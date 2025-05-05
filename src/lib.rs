@@ -93,6 +93,14 @@ impl HttpClient {
             .map_err(|e| JsValue::from_str(&e))
     }
 
+    // General prompt for AI API
+    pub fn prompt(&self, prompt: &str) -> Result<String, JsValue> {
+        let json_data = json!({
+            "prompt": prompt,
+        });
+        Ok(json_data.to_string())
+    }
+
     /// Generate an image using Stable Diffusion API (for WASM)
     pub fn generate_image_sync(&self, prompt: &str, width: u32, height: u32, steps: u32) -> Result<String, JsValue> {
         let url = "https://api.stability.ai/v1/generation/stable-diffusion-xl-beta-v2-2-2/text-to-image";
