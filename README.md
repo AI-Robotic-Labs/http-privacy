@@ -20,8 +20,8 @@ You can use OpenAI API and others for get privacy using HTTP (REST/GET)
 - [x] Qwen API
 - [x] Claude API
 - [x] Llama API
-- [ ] Stable Diffusion API
-- [ ] Model prompt
+- [x] Stable Diffusion API
+- [x] Model prompt
 - [ ] MCP Server
 - [ ] SOCKS5 proxy
 
