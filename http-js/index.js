@@ -88,7 +88,7 @@ app.post('/', (req, res) => {
   }
   if (method === 'tasks/send') {
     const { message } = params;
-    const text = message?.parts?.[0]?.text || '';
+    const text = message?.parts?.[0]?.text || 'No text provided';
     const response = {
       jsonrpc: '2.0',
       id,
