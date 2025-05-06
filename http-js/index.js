@@ -108,8 +108,9 @@ app.get('/', (req, res) => {
   res.json({ message: 'Privacy-focused HTTP server with A2A support' });
 });
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+// Start server
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
 
 // Start server
