@@ -11,6 +11,7 @@ import requests
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import HttpClientPy
 import Prompt
+from python_a2a import A2AServer, skill, agent, run_server, TaskStatus, TaskState
 
 app = Flask(__name__)
 

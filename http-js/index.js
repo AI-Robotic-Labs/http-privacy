@@ -62,6 +62,56 @@ app.get('/api/ai', async (req, res) => {
     }
 });
 
+// A2A AgentCard
+const agentCard = {
+  name: "PrivacyServerJS",
+  description: "Privacy-focused HTTP server with A2A support",
+  url: "http://localhost:3000",
+  version: "1.0.0",
+  capabilities: {
+    streaming: false,
+    pushNotifications: false,
+    stateTransitionHistory: false
+  }
+};
+
+// A2A AgentCard endpoint
+app.get('/.well-known/agent.json', (req, res) => {
+  res.json(agentCard);
+});
+
+// A2A tasks/send endpoint (JSON-RPC)
+app.post('/', (req, res) => {
+  const { jsonrpc, id, method, params } = req.body;
+  if (jsonrpc !== '2.0' || !id || !method || !params) {
+    return res.status(400).json({ jsonrpc: '2.0', error: { code: -32600, message: 'Invalid Request' }, id });
+  }
+  if (method === 'tasks/send') {
+    const { message } = params;
+    const text = message?.parts?.[0]?.text || '';
+    const response = {
+      jsonrpc: '2.0',
+      id,
+      result: {
+        id: params.id || 'task-' + Date.now(),
+        status: { state: 'completed', timestamp: new Date().toISOString() },
+        artifacts: [{ parts: [{ type: 'text', text: `Processed: ${text}` }], index: 0 }]
+      }
+    };
+    return res.json(response);
+  }
+  res.status(400).json({ jsonrpc: '2.0', error: { code: -32601, message: 'Method not found' }, id });
+});
+
+// Basic HTTP endpoint
+app.get('/', (req, res) => {
+  res.json({ message: 'Privacy-focused HTTP server with A2A support' });
+});
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
