@@ -143,6 +143,9 @@ int main() {
     // Initialize the privacy_http_sdk client
     auto client = privacy_http_sdk::new_http_client();
 
+    // A2A server
+    auto A2A = privacy_http_sdk::new_http_client();
+
     std::cout << "PrivacyHttpSdk Version: " << PRIVACY_HTTP_SDK_VERSION << std::endl;
 
     // Existing GET/POST requests (corrected typos and consolidated)

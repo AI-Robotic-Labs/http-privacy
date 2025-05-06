@@ -48,6 +48,9 @@ ollama_client = OpenAI(
     base_url="http://localhost:11434"
 )
 
+A2AServer = A2AServer(
+    api_key=os.getenv('A2A_API_KEY')
+)
 # Initialize with Stability AI API key
 client = HttpClientPy ("your-stability-ai-api-key", "")
 
