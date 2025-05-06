@@ -63,6 +63,14 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 # Define the Gemini model
 gemini_model = genai.GenerativeModel("gemini-pro")
 
+# A2A server
+
+def Ai_agent = agent
+json_data = {
+    "metadata":"metadata"
+    "version": "version"
+}
+
 # Prompt AI example
 Prompt.generate_prompt(
     prompt="hello world"
