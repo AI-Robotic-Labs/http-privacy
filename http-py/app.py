@@ -12,6 +12,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import HttpClientPy
 import Prompt
 from python_a2a import A2AServer, skill, agent, run_server, TaskStatus, TaskState
+import agent
 
 app = Flask(__name__)
 
@@ -65,12 +66,12 @@ gemini_model = genai.GenerativeModel("gemini-pro")
 
 # A2A server
 
-def Ai_agent = agent
-json_data = {
-    "metadata":"metadata"
-    "version": "version"
-}
-
+def Ai_agent():
+    agentjson_data = {
+        "metadata": "metadata",
+        "version": "version"
+    }
+    return agentjson_data
 # Prompt AI example
 Prompt.generate_prompt(
     prompt="hello world"
