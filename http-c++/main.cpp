@@ -7,17 +7,17 @@
 #include <pybind11/embed.h>
 #include <httplib.h>
 #include <fstream>
+#include <string>
 
 using json = nlohmann::json;
 namespace py = pybind11;
 
-// Python code to run Stable Diffusion (embedded via pybind11)
+// Python code to run Stable Diffusion (unchanged)
 std::string run_stable_diffusion(const std::string& prompt, int width, int height, int steps) {
-    py::scoped_interpreter guard{}; // Start Python interpreter
+    py::scoped_interpreter guard{};
     try {
         auto module = py::module_::import("sys");
-        module.attr("path").attr("append")("."); // Add current directory to Python path
-
+        module.attr("path").attr("append")(".");
         std::string code = R"(
 import torch
 from diffusers import StableDiffusionPipeline
@@ -52,10 +52,51 @@ def generate_image(prompt, width, height, steps):
     }
 }
 
-// Start the local Stable Diffusion API server
+// Process MCP messages
+json process_mcp_message(const json& message) {
+    try {
+        std::string message_type = message.at("message_type").get<std::string>();
+        std::string sender = message.at("sender").get<std::string>();
+        json payload = message.at("payload");
+
+        // Example processing based on message_type
+        if (message_type == "command") {
+            std::string action = payload.at("action").get<std::string>();
+            std::string data = payload.at("data").get<std::string>();
+            // Example: Echo the action and data
+            return {
+                {"status", "success"},
+                {"response", "Received command from " + sender + ": " + action + ", data: " + data},
+                {"message_id", "123"} // Placeholder ID
+            };
+        } else if (message_type == "query") {
+            // Example: Handle a query
+            return {
+                {"status", "success"},
+                {"response", "Query processed for " + sender},
+                {"message_id", "124"}
+            };
+        } else {
+            return {
+                {"status", "error"},
+                {"response", "Unknown message_type: " + message_type},
+                {"message_id", "0"}
+            };
+        }
+    } catch (const std::exception& e) {
+        return {
+            {"status", "error"},
+            {"response", "Invalid MCP message: " + std::string(e.what())},
+            {"message_id", "0"}
+        };
+    }
+}
+
+// Start the local API server with MCP endpoint
 void start_api_server() {
     httplib::Server svr;
 
+    // Existing Stable Diffusion endpoint
     svr.Post("/txt2img", [](const httplib::Request& req, httplib::Response& res) {
         try {
             json payload = json::parse(req.body);
@@ -64,20 +105,14 @@ void start_api_server() {
             int height = payload["height"].get<int>();
             int steps = payload["steps"].get<int>();
 
-            // Sanitize prompt (basic example)
-            // Sanitize prompt (basic example)
             if (prompt.find("<script") != std::string::npos || prompt.find("..") != std::string::npos) {
                 res.set_content("Invalid prompt", "text/plain");
                 res.status = 400;
                 return;
             }
 
-            // Generate image
             std::string image_base64 = run_stable_diffusion(prompt, width, height, steps);
-
-            json response = {
-                {"image", image_base64}
-            };
+            json response = {{"image", image_base64}};
             res.set_content(response.dump(), "application/json");
         } catch (const std::exception& e) {
             res.set_content("Error: " + std::string(e.what()), "text/plain");
@@ -85,14 +120,30 @@ void start_api_server() {
         }
     });
 
-    std::cout << "Starting Stable Diffusion API server on http://127.0.0.1:8080" << std::endl;
+    // New MCP endpoint
+    svr.Post("/mcp", [](const httplib::Request& req, httplib::Response& res) {
+        try {
+            json message = json::parse(req.body);
+            json response = process_mcp_message(message);
+            res.set_content(response.dump(), "application/json");
+        } catch (const std::exception& e) {
+            json error = {
+                {"status", "error"},
+                {"response", "Failed to process MCP message: " + std::string(e.what())},
+                {"message_id", "0"}
+            };
+            res.set_content(error.dump(), "application/json");
+            res.status = 400;
+        }
+    });
+
+    std::cout << "Starting API server on http://127.0.0.1:8080" << std::endl;
+    std::cout << "MCP endpoint available at http://127.0.0.1:8080/mcp" << std::endl;
     svr.listen("127.0.0.1", 8080);
 }
 
-// Extend the privacy_http_sdk client interface
+// Extend the privacy_http_sdk client interface (unchanged)
 namespace privacy_http_sdk {
-    // Assume HttpClient is the type returned by new_http_client()
-    // If the actual type differs, adjust accordingly
     void generate_image(
         HttpClient& client,
         const std::string& prompt,
@@ -105,25 +156,17 @@ namespace privacy_http_sdk {
         std::unordered_map<std::string, std::string> headers = {
             {"Content-Type", "application/json"}
         };
-
         json payload = {
             {"prompt", prompt},
             {"width", width},
             {"height", height},
             {"steps", steps}
         };
-
         std::string body = payload.dump();
         std::string response = client.post(url, headers, body);
-
         json response_json = json::parse(response);
         std::string image_data = response_json["image"].get<std::string>();
-
-        // Decode base64 (placeholder; use a library like cpp-base64 for production)
-        // For simplicity, assume image_data is already usable
-        // Replace with actual base64 decoding in production
         std::string decoded = image_data; // TODO: Implement base64 decoding
-
         std::ofstream file(output_path, std::ios::binary);
         if (!file) {
             throw std::runtime_error("Failed to open output file: " + output_path);
@@ -134,7 +177,7 @@ namespace privacy_http_sdk {
 }
 
 int main() {
-    // Start the Stable Diffusion API server in a separate thread
+    // Start the API server (with MCP endpoint) in a separate thread
     std::thread server_thread(start_api_server);
 
     // Wait briefly to ensure server starts
@@ -143,29 +186,44 @@ int main() {
     // Initialize the privacy_http_sdk client
     auto client = privacy_http_sdk::new_http_client();
 
-    // A2A server
-    auto A2A = privacy_http_sdk::new_http_client();
-
     std::cout << "PrivacyHttpSdk Version: " << PRIVACY_HTTP_SDK_VERSION << std::endl;
 
-    // Existing GET/POST requests (corrected typos and consolidated)
+    // Test the MCP endpoint
+    try {
+        std::string mcp_url = "http://127.0.0.1:8080/mcp";
+        std::unordered_map<std::string, std::string> headers = {
+            {"Content-Type", "application/json"}
+        };
+        json mcp_message = {
+            {"message_type", "command"},
+            {"sender", "test_client"},
+            {"payload", {
+                {"action", "test_action"},
+                {"data", "test_data"}
+            }}
+        };
+        std::string mcp_body = mcp_message.dump();
+        auto mcp_response = client->post(mcp_url, headers, mcp_body);
+        std::cout << "MCP Response: " << mcp_response << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "MCP Error: " << e.what() << std::endl;
+    }
+
+    // Existing GET/POST requests (unchanged)
     std::unordered_map<std::string, std::string> headers = {
         {"Authorization", "Bearer YOUR_API_KEY"},
         {"Content-Type", "application/json"}
     };
-
-    // Perform GET requests
     std::vector<std::string> urls = {
         "https://api.openai.com/v1/models",
-        "https://api.gemini.google.com/v1/models", // Corrected URL
+        "https://api.gemini.google.com/v1/models",
         "https://api.deepseek.com",
-        "https://bedrock-runtime.us-east-1.amazonaws.com", // Specified region
+        "https://bedrock-runtime.us-east-1.amazonaws.com",
         "https://api.x.ai/v1/models",
         "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
-        "https://api.anthropic.com/v1/messages", // Corrected Claude URL
-        "http://localhost:11434/api/generate" // Ollama local API
+        "https://api.anthropic.com/v1/messages",
+        "http://localhost:11434/api/generate"
     };
-
     for (const auto& url : urls) {
         try {
             auto response = client->get(url, headers);
@@ -174,8 +232,6 @@ int main() {
             std::cerr << "GET Error from " << url << ": " << e.what() << std::endl;
         }
     }
-
-    // Perform a POST request (example)
     try {
         std::string body = R"({"prompt": "Hello, world!", "max_tokens": 5})";
         auto response = client->post("https://api.openai.com/v1/completions", headers, body);
@@ -184,7 +240,7 @@ int main() {
         std::cerr << "POST Error: " << e.what() << std::endl;
     }
 
-    // Perform Stable Diffusion image generation
+    // Perform Stable Diffusion image generation (unchanged)
     try {
         privacy_http_sdk::generate_image(*client, "A serene landscape", 512, 512, 50, "output.png");
         std::cout << "Image saved to output.png" << std::endl;
@@ -192,7 +248,6 @@ int main() {
         std::cerr << "Stable Diffusion Error: " << e.what() << std::endl;
     }
 
-    // Keep the program running
     server_thread.join();
     return 0;
 }
