@@ -45,7 +45,13 @@ pub struct HttpClient {
     #[allow(dead_code)]
     ollama_api_key: String,
     #[allow(dead_code)]
-    a2_a_sever: String
+    a2_a_sever: String,
+    #[allow(dead_code)]
+    request: String,
+    #[allow(dead_code)]
+    response: String,
+    #[allow(dead_code)]
+    mcp_server: String
 }
 #[wasm_bindgen]
 impl HttpClient {
@@ -79,6 +85,9 @@ impl HttpClient {
             xai_api_key: api_key.clone(),
             claude_api_key: api_key.clone(),
             ollama_api_key: api_key,
+            request: String::new(),
+            response: String::new(),
+            mcp_server: String::new()
         }
     }
     pub fn get_sync(&self, url: &str, headers: JsValue) -> Result<String, JsValue> {

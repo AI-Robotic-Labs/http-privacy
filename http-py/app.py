@@ -13,7 +13,7 @@ import HttpClientPy
 import Prompt
 from python_a2a import A2AServer, skill, agent, run_server, TaskStatus, TaskState
 import agent
-
+from mcp.server.fastmcp import Context, FastMCP
 app = Flask(__name__)
 
 # Initialize clients with proper separation
@@ -52,6 +52,11 @@ ollama_client = OpenAI(
 A2AServer = A2AServer(
     api_key=os.getenv('A2A_API_KEY')
 )
+
+mcp = FastMCP(
+    api_key=os.getenv('MCP_API_KEY')
+)
+
 # Initialize with Stability AI API key
 client = HttpClientPy ("your-stability-ai-api-key", "")
 

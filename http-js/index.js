@@ -7,9 +7,42 @@ const OpenAI = require ('openai');
 const { BedrockRuntimeClient } = require("@aws-sdk/client-bedrock-runtime");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const axios = require('axios');
+const { McpServer, ResourceTemplate } = require("McpServer");
+const { StdioServerTransport } = require("McpServer");
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Create an MCP server
+const server = new McpServer({
+  name: "Demo",
+  version: "1.0.0"
+});
+
+// Add an addition tool
+server.tool("add",
+  { a: z.number(), b: z.number() },
+  async ({ a, b }) => ({
+    content: [{ type: "text", text: String(a + b) }]
+  })
+);
+
+// Add a dynamic greeting resource
+server.resource(
+  "greeting",
+  new ResourceTemplate("greeting://{name}", { list: undefined }),
+  async (uri, { name }) => ({
+    contents: [{
+      uri: uri.href,
+      text: `Hello, ${name}!`
+    }]
+  })
+);
+
+// Start receiving messages on stdin and sending messages on stdout
+const transport = new StdioServerTransport();
+await server.connect(transport);
 
 // Middleware: Set secure HTTP headers using Helmet
 app.use(helmet());
