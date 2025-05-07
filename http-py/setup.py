@@ -11,9 +11,10 @@ setup(
         "qwen-agent==.0.0.21",
         "llama-cpp-python==0.3.8",
         "openai==1.77.0",
-        "boto3==1.38.9",
         "google-generativeai==0.8.5",
         "mcp==1.7.1"
+        "boto3==1.38.10",
+        "google-generativeai==0.8.5"
 
     ],
     author="AI & Robotic Labs",  # Fixed: Closed quotation
