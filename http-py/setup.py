@@ -13,7 +13,7 @@ setup(
         "openai==1.77.0",
         "google-generativeai==0.8.5",
         "mcp==1.7.1"
-        "boto3==1.38.10",
+        "boto3==1.38.11",
         "google-generativeai==0.8.5"
 
     ],
