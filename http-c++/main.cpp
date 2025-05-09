@@ -220,6 +220,7 @@ int main() {
         "https://api.deepseek.com",
         "https://bedrock-runtime.us-east-1.amazonaws.com",
         "https://api.x.ai/v1/models",
+        "https://api.x.ai/v1", // Grok 3 API
         "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
         "https://api.anthropic.com/v1/messages",
         "http://localhost:11434/api/generate"
