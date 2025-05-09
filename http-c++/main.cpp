@@ -176,6 +176,150 @@ namespace privacy_http_sdk {
     }
 }
 
+// A2A Server
+class PrivacyServer {
+    private:
+        http_listener listener;
+        const std::string base_url = "http://localhost:3000";
+    
+        // AgentCard definition
+        json::value getAgentCard() {
+            json::value card;
+            card[U("name")] = json::value::string(U("PrivacyServerCPP"));
+            card[U("description")] = json::value::string(U("Privacy-focused HTTP server with A2A support"));
+            card[U("url")] = json::value::string(U(base_url));
+            card[U("version")] = json::value::string(U("1.0.0"));
+            
+            json::value capabilities;
+            capabilities[U("streaming")] = json::value::boolean(false);
+            capabilities[U("pushNotifications")] = json::value::boolean(false);
+            capabilities[U("stateTransitionHistory")] = json::value::boolean(false);
+            card[U("capabilities")] = capabilities;
+            
+            return card;
+        }
+    
+        // Utility to create JSON-RPC error response
+        json::value createErrorResponse(int id, int code, const std::string& message) {
+            json::value error;
+            error[U("code")] = json::value::number(code);
+            error[U("message")] = json::value::string(U(message));
+            
+            json::value response;
+            response[U("jsonrpc")] = json::value::string(U("2.0"));
+            response[U("error")] = error;
+            response[U("id")] = json::value::number(id);
+            return response;
+        }
+    
+    public:
+        PrivacyServer(const std::string& url) : listener(U(url)) {
+            // Handle A2A AgentCard endpoint
+            listener.support(methods::GET, [this](http_request request) {
+                auto path = request.relative_uri().to_string();
+                if (path == "/.well-known/agent.json") {
+                    request.reply(status_codes::OK, getAgentCard());
+                    return;
+                }
+                // Handle basic HTTP endpoint
+                if (path == "/") {
+                    json::value response;
+                    response[U("message")] = json::value::string(U("Privacy-focused HTTP server with A2A support"));
+                    request.reply(status_codes::OK, response);
+                    return;
+                }
+                request.reply(status_codes::NotFound);
+            });
+    
+            // Handle A2A tasks/send endpoint (JSON-RPC)
+            listener.support(methods::POST, [this](http_request request) {
+                if (request.relative_uri().to_string() != "/") {
+                    request.reply(status_codes::NotFound);
+                    return;
+                }
+    
+                request.extract_json().then([request, this](json::value body) {
+                    try {
+                        if (!body.has_field(U("jsonrpc")) || body[U("jsonrpc")].as_string() != "2.0" ||
+                            !body.has_field(U("id")) || !body.has_field(U("method")) || !body.has_field(U("params"))) {
+                            request.reply(status_codes::BadRequest, 
+                                createErrorResponse(body.has_field(U("id")) ? body[U("id")].as_integer() : 0, 
+                                                 -32600, "Invalid Request"));
+                            return;
+                        }
+    
+                        std::string method = body[U("method")].as_string();
+                        int id = body[U("id")].as_integer();
+    
+                        if (method == "tasks/send") {
+                            auto params = body[U("params")];
+                            std::string text = "No text provided";
+                            if (params.has_field(U("message")) && params[U("message")].has_field(U("parts")) &&
+                                params[U("message")][U("parts")].is_array() && 
+                                params[U("message")][U("parts")].as_array().size() > 0 &&
+                                params[U("message")][U("parts")][0].has_field(U("text"))) {
+                                text = params[U("message")][U("parts")][0][U("text")].as_string();
+                            }
+    
+                            json::value response;
+                            response[U("jsonrpc")] = json::value::string(U("2.0"));
+                            response[U("id")] = json::value::number(id);
+    
+                            json::value result;
+                            result[U("id")] = json::value::string(
+                                params.has_field(U("id")) ? params[U("id")].as_string() : 
+                                "task-" + std::to_string(std::time(nullptr)));
+    
+                            json::value status;
+                            status[U("state")] = json::value::string(U("completed"));
+                            status[U("timestamp")] = json::value::string(U("2025-05-09T00:00:00Z")); // Simplified for example
+                            result[U("status")] = status;
+    
+                            json::value artifacts = json::value::array();
+                            json::value artifact;
+                            json::value parts = json::value::array();
+                            json::value part;
+                            part[U("type")] = json::value::string(U("text"));
+                            part[U("text")] = json::value::string(U("Processed: " + text));
+                            parts[0] = part;
+                            artifact[U("parts")] = parts;
+                            artifact[U("index")] = json::value::number(0);
+                            artifacts[0] = artifact;
+                            result[U("artifacts")] = artifacts;
+    
+                            response[U("result")] = result;
+                            request.reply(status_codes::OK, response);
+                        } else {
+                            request.reply(status_codes::BadRequest, 
+                                createErrorResponse(id, -32601, "Method not found"));
+                        }
+                    } catch (const std::exception& e) {
+                        request.reply(status_codes::InternalError);
+                    }
+                });
+            });
+        }
+    
+        void start() {
+            try {
+                listener.open().wait();
+                std::cout << "Server is running on " << base_url << std::endl;
+            } catch (const std::exception& e) {
+                std::cerr << "Error starting server: " << e.what() << std::endl;
+            }
+        }
+    };
+    
+    int main() {
+        PrivacyServer server("http://localhost:3000");
+        server.start();
+        
+        std::cout << "Press Enter to exit..." << std::endl;
+        std::cin.get();
+        return 0;
+    }
+
+
 int main() {
     // Start the API server (with MCP endpoint) in a separate thread
     std::thread server_thread(start_api_server);
