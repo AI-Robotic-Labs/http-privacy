@@ -1,21 +1,34 @@
-name: C/C++ CI
+name: Build C++ with Rust Library
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: configure
-      run: ./configure
-    - name: make
-      run: make
-    - name: make check
-      run: make check
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+
+    - name: Build Rust shared library
+      run: |
+        cd privacy_http_sdk
+        cargo build --release
+
+    - name: Build C++ project with CMake
+      run: |
+        mkdir -p http-c++/build
+        cd http-c++/build
+        cmake ..
+        make
+
