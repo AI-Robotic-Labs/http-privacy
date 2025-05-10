@@ -1,4 +1,4 @@
-name: Build C++ with Rust Library
+name: Build C++ project
 
 on:
   push:
@@ -9,26 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
-
-    - name: Build Rust shared library
+    - uses: actions/checkout@v2
+    - name: Build
       run: |
-        cd privacy_http_sdk
-        cargo build --release
-
-    - name: Build C++ project with CMake
-      run: |
-        mkdir -p http-c++/build
-        cd http-c++/build
-        cmake ..
-        make
-
+        cmake -S http-c++ -B http-c++/build
+        cmake --build http-c++/build
