@@ -44,6 +44,16 @@ pub struct HttpClient {
     claude_api_key: String,
     #[allow(dead_code)]
     ollama_api_key: String,
+    #[allow(dead_code)]
+    a2_a_sever: String,
+    #[allow(dead_code)]
+    request: String,
+    #[allow(dead_code)]
+    response: String,
+    #[allow(dead_code)]
+    mcp_server: String,
+    #[allow(dead_code)]
+    base_url_:String
 }
 #[wasm_bindgen]
 impl HttpClient {
@@ -71,14 +81,18 @@ impl HttpClient {
             deepseek_client,
             qwen_api_key: api_key.clone(),
             qwen_client,
+            a2_a_sever: String::new(),
             deepseek_api_key: api_key.clone(),
             s3_client: Client::new(),
             xai_api_key: api_key.clone(),
             claude_api_key: api_key.clone(),
             ollama_api_key: api_key,
+            request: String::new(),
+            response: String::new(),
+            mcp_server: String::new(),
+            base_url_: String::new()
         }
     }
-
     pub fn get_sync(&self, url: &str, headers: JsValue) -> Result<String, JsValue> {
         let headers_vec = Self::js_headers_to_vec(headers)?;
         self.runtime
