@@ -8,8 +8,6 @@ setup(
         "Flask==3.1.0",    # Fixed: Properly formatted as a list of strings
         "requests==2.32.3",
         "user_agent==0.1.10",
-        "qwen-agent==.0.0.21",
-        "openai==1.78.0",
         "google-generativeai==0.8.5",
         "mcp==1.8.0"
         "qwen-agent==.0.0.22",
