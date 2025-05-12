@@ -17,3 +17,7 @@ You can use AI APIs (OpenAI, Claude, xAI...) and others for get privacy using HT
 - MCP Server
 - A2A comaptible
 - Model Prompt
+
+## Documentation
+
+[Docs](https://github.com/AI-Robotic-Labs/http-privacy/tree/main/doc)
