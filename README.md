@@ -13,7 +13,7 @@ You can use AI APIs (OpenAI, Claude, xAI...) and others for get privacy using HT
 
 ## Features
 
-- REST/GET API cross APIs from AIs
+- REST/GET API cross from AIs
 - MCP Server
 - A2A comaptible
 - Model Prompt
