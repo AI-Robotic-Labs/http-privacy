@@ -1,13 +1,13 @@
 name: Build C++ Module
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Allows manual triggering of the workflow
   push:
     paths:
-      - 'http-c++/**'
+      - '**/*'  # Temporarily simplify to trigger for any file changes
   pull_request:
     paths:
-      - 'http-c++/**'
+      - '**/*'  # Temporarily simplify to trigger for any file changes
 
 jobs:
   build:
@@ -27,3 +27,4 @@ jobs:
 
       - name: Build C++ project
         run: cmake --build http-c++/build
+
