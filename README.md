@@ -9,19 +9,11 @@
 
 HTTP and AI for privacy APIs
 
-You can use OpenAI API and others for get privacy using HTTP (REST/GET)
+You can use AI APIs (OpenAI, Claude, xAI...) and others for get privacy using HTTP (REST/GET)
 
-## Roadmap
+## Features
 
-- [x] Deep Seek API
-- [x] Nova Pro API
-- [x] Grok API
-- [x] Gemini Node.js and Python bindings
-- [x] Qwen API
-- [x] Claude API
-- [x] Llama API
-- [x] Stable Diffusion API
-- [x] Model prompt
-- [x] A2A
-- [x] MCP Server
-
+- REST/GET API cross APIs from AIs
+- MCP Server
+- A2A comaptible
+- Model Prompt
