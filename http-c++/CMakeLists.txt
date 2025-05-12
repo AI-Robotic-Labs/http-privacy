@@ -1,8 +1,16 @@
 cmake_minimum_required(VERSION 3.15)
-project(PrivacyHttpSdk VERSION 1.0.4)  # Valid version format
+project(PrivacyHttpSdk VERSION 1.0.4)  # Use a valid version number (no hyphen)
 
-# Optional: Define the full version string separately
+# Define the full version string (including the 'beta' part)
 set(PROJECT_VERSION "1.0.4-beta")
+
+# Split the version into major, minor, and patch components
+string(REGEX MATCH "^([0-9]+)" PROJECT_VERSION_MAJOR ${PROJECT_VERSION})
+string(REGEX MATCH "\\.([0-9]+)" PROJECT_VERSION_MINOR ${PROJECT_VERSION})
+string(REGEX MATCH "\\.([0-9]+)[^0-9]" PROJECT_VERSION_PATCH ${PROJECT_VERSION})
+
+# Optionally, you can define a custom suffix for beta/alpha versions
+set(PROJECT_VERSION_SUFFIX "beta")
 
 # Add Rust shared library
 set(RUST_LIB_PATH "../privacy_http_sdk/target/release")
@@ -17,7 +25,7 @@ add_executable(http_client main.cpp)
 # Link the Rust library
 target_link_libraries(http_client "${RUST_LIB}")
 
-# Configure a header file with version information
+# Generate version.h from version.h.in
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/version.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
