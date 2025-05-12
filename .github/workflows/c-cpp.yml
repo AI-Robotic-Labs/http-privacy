@@ -1,6 +1,7 @@
 name: Build C++ Module
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'http-c++/**'
