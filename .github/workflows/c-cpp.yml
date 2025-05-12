@@ -1,0 +1,28 @@
+name: Build C++ Module
+
+on:
+  push:
+    paths:
+      - 'http-c++/**'
+  pull_request:
+    paths:
+      - 'http-c++/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential
+
+      - name: Create build directory and configure CMake
+        run: |
+          mkdir -p http-c++/build
+          cmake -S http-c++ -B http-c++/build
+
+      - name: Build C++ project
+        run: cmake --build http-c++/build

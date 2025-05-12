@@ -7,17 +7,17 @@
 #include <pybind11/embed.h>
 #include <httplib.h>
 #include <fstream>
+#include <string>
 
 using json = nlohmann::json;
 namespace py = pybind11;
 
-// Python code to run Stable Diffusion (embedded via pybind11)
+// Python code to run Stable Diffusion (unchanged)
 std::string run_stable_diffusion(const std::string& prompt, int width, int height, int steps) {
-    py::scoped_interpreter guard{}; // Start Python interpreter
+    py::scoped_interpreter guard{};
     try {
         auto module = py::module_::import("sys");
-        module.attr("path").attr("append")("."); // Add current directory to Python path
-
+        module.attr("path").attr("append")(".");
         std::string code = R"(
 import torch
 from diffusers import StableDiffusionPipeline
@@ -52,10 +52,51 @@ def generate_image(prompt, width, height, steps):
     }
 }
 
-// Start the local Stable Diffusion API server
+// Process MCP messages
+json process_mcp_message(const json& message) {
+    try {
+        std::string message_type = message.at("message_type").get<std::string>();
+        std::string sender = message.at("sender").get<std::string>();
+        json payload = message.at("payload");
+
+        // Example processing based on message_type
+        if (message_type == "command") {
+            std::string action = payload.at("action").get<std::string>();
+            std::string data = payload.at("data").get<std::string>();
+            // Example: Echo the action and data
+            return {
+                {"status", "success"},
+                {"response", "Received command from " + sender + ": " + action + ", data: " + data},
+                {"message_id", "123"} // Placeholder ID
+            };
+        } else if (message_type == "query") {
+            // Example: Handle a query
+            return {
+                {"status", "success"},
+                {"response", "Query processed for " + sender},
+                {"message_id", "124"}
+            };
+        } else {
+            return {
+                {"status", "error"},
+                {"response", "Unknown message_type: " + message_type},
+                {"message_id", "0"}
+            };
+        }
+    } catch (const std::exception& e) {
+        return {
+            {"status", "error"},
+            {"response", "Invalid MCP message: " + std::string(e.what())},
+            {"message_id", "0"}
+        };
+    }
+}
+
+// Start the local API server with MCP endpoint
 void start_api_server() {
     httplib::Server svr;
 
+    // Existing Stable Diffusion endpoint
     svr.Post("/txt2img", [](const httplib::Request& req, httplib::Response& res) {
         try {
             json payload = json::parse(req.body);
@@ -64,20 +105,14 @@ void start_api_server() {
             int height = payload["height"].get<int>();
             int steps = payload["steps"].get<int>();
 
-            // Sanitize prompt (basic example)
-            // Sanitize prompt (basic example)
             if (prompt.find("<script") != std::string::npos || prompt.find("..") != std::string::npos) {
                 res.set_content("Invalid prompt", "text/plain");
                 res.status = 400;
                 return;
             }
 
-            // Generate image
             std::string image_base64 = run_stable_diffusion(prompt, width, height, steps);
-
-            json response = {
-                {"image", image_base64}
-            };
+            json response = {{"image", image_base64}};
             res.set_content(response.dump(), "application/json");
         } catch (const std::exception& e) {
             res.set_content("Error: " + std::string(e.what()), "text/plain");
@@ -85,14 +120,30 @@ void start_api_server() {
         }
     });
 
-    std::cout << "Starting Stable Diffusion API server on http://127.0.0.1:8080" << std::endl;
+    // New MCP endpoint
+    svr.Post("/mcp", [](const httplib::Request& req, httplib::Response& res) {
+        try {
+            json message = json::parse(req.body);
+            json response = process_mcp_message(message);
+            res.set_content(response.dump(), "application/json");
+        } catch (const std::exception& e) {
+            json error = {
+                {"status", "error"},
+                {"response", "Failed to process MCP message: " + std::string(e.what())},
+                {"message_id", "0"}
+            };
+            res.set_content(error.dump(), "application/json");
+            res.status = 400;
+        }
+    });
+
+    std::cout << "Starting API server on http://127.0.0.1:8080" << std::endl;
+    std::cout << "MCP endpoint available at http://127.0.0.1:8080/mcp" << std::endl;
     svr.listen("127.0.0.1", 8080);
 }
 
-// Extend the privacy_http_sdk client interface
+// Extend the privacy_http_sdk client interface (unchanged)
 namespace privacy_http_sdk {
-    // Assume HttpClient is the type returned by new_http_client()
-    // If the actual type differs, adjust accordingly
     void generate_image(
         HttpClient& client,
         const std::string& prompt,
@@ -105,25 +156,17 @@ namespace privacy_http_sdk {
         std::unordered_map<std::string, std::string> headers = {
             {"Content-Type", "application/json"}
         };
-
         json payload = {
             {"prompt", prompt},
             {"width", width},
             {"height", height},
             {"steps", steps}
         };
-
         std::string body = payload.dump();
         std::string response = client.post(url, headers, body);
-
         json response_json = json::parse(response);
         std::string image_data = response_json["image"].get<std::string>();
-
-        // Decode base64 (placeholder; use a library like cpp-base64 for production)
-        // For simplicity, assume image_data is already usable
-        // Replace with actual base64 decoding in production
         std::string decoded = image_data; // TODO: Implement base64 decoding
-
         std::ofstream file(output_path, std::ios::binary);
         if (!file) {
             throw std::runtime_error("Failed to open output file: " + output_path);
@@ -133,8 +176,152 @@ namespace privacy_http_sdk {
     }
 }
 
+// A2A Server
+class PrivacyServer {
+    private:
+        http_listener listener;
+        const std::string base_url = "http://localhost:3000";
+    
+        // AgentCard definition
+        json::value getAgentCard() {
+            json::value card;
+            card[U("name")] = json::value::string(U("PrivacyServerCPP"));
+            card[U("description")] = json::value::string(U("Privacy-focused HTTP server with A2A support"));
+            card[U("url")] = json::value::string(U(base_url));
+            card[U("version")] = json::value::string(U("1.0.0"));
+            
+            json::value capabilities;
+            capabilities[U("streaming")] = json::value::boolean(false);
+            capabilities[U("pushNotifications")] = json::value::boolean(false);
+            capabilities[U("stateTransitionHistory")] = json::value::boolean(false);
+            card[U("capabilities")] = capabilities;
+            
+            return card;
+        }
+    
+        // Utility to create JSON-RPC error response
+        json::value createErrorResponse(int id, int code, const std::string& message) {
+            json::value error;
+            error[U("code")] = json::value::number(code);
+            error[U("message")] = json::value::string(U(message));
+            
+            json::value response;
+            response[U("jsonrpc")] = json::value::string(U("2.0"));
+            response[U("error")] = error;
+            response[U("id")] = json::value::number(id);
+            return response;
+        }
+    
+    public:
+        PrivacyServer(const std::string& url) : listener(U(url)) {
+            // Handle A2A AgentCard endpoint
+            listener.support(methods::GET, [this](http_request request) {
+                auto path = request.relative_uri().to_string();
+                if (path == "/.well-known/agent.json") {
+                    request.reply(status_codes::OK, getAgentCard());
+                    return;
+                }
+                // Handle basic HTTP endpoint
+                if (path == "/") {
+                    json::value response;
+                    response[U("message")] = json::value::string(U("Privacy-focused HTTP server with A2A support"));
+                    request.reply(status_codes::OK, response);
+                    return;
+                }
+                request.reply(status_codes::NotFound);
+            });
+    
+            // Handle A2A tasks/send endpoint (JSON-RPC)
+            listener.support(methods::POST, [this](http_request request) {
+                if (request.relative_uri().to_string() != "/") {
+                    request.reply(status_codes::NotFound);
+                    return;
+                }
+    
+                request.extract_json().then([request, this](json::value body) {
+                    try {
+                        if (!body.has_field(U("jsonrpc")) || body[U("jsonrpc")].as_string() != "2.0" ||
+                            !body.has_field(U("id")) || !body.has_field(U("method")) || !body.has_field(U("params"))) {
+                            request.reply(status_codes::BadRequest, 
+                                createErrorResponse(body.has_field(U("id")) ? body[U("id")].as_integer() : 0, 
+                                                 -32600, "Invalid Request"));
+                            return;
+                        }
+    
+                        std::string method = body[U("method")].as_string();
+                        int id = body[U("id")].as_integer();
+    
+                        if (method == "tasks/send") {
+                            auto params = body[U("params")];
+                            std::string text = "No text provided";
+                            if (params.has_field(U("message")) && params[U("message")].has_field(U("parts")) &&
+                                params[U("message")][U("parts")].is_array() && 
+                                params[U("message")][U("parts")].as_array().size() > 0 &&
+                                params[U("message")][U("parts")][0].has_field(U("text"))) {
+                                text = params[U("message")][U("parts")][0][U("text")].as_string();
+                            }
+    
+                            json::value response;
+                            response[U("jsonrpc")] = json::value::string(U("2.0"));
+                            response[U("id")] = json::value::number(id);
+    
+                            json::value result;
+                            result[U("id")] = json::value::string(
+                                params.has_field(U("id")) ? params[U("id")].as_string() : 
+                                "task-" + std::to_string(std::time(nullptr)));
+    
+                            json::value status;
+                            status[U("state")] = json::value::string(U("completed"));
+                            status[U("timestamp")] = json::value::string(U("2025-05-09T00:00:00Z")); // Simplified for example
+                            result[U("status")] = status;
+    
+                            json::value artifacts = json::value::array();
+                            json::value artifact;
+                            json::value parts = json::value::array();
+                            json::value part;
+                            part[U("type")] = json::value::string(U("text"));
+                            part[U("text")] = json::value::string(U("Processed: " + text));
+                            parts[0] = part;
+                            artifact[U("parts")] = parts;
+                            artifact[U("index")] = json::value::number(0);
+                            artifacts[0] = artifact;
+                            result[U("artifacts")] = artifacts;
+    
+                            response[U("result")] = result;
+                            request.reply(status_codes::OK, response);
+                        } else {
+                            request.reply(status_codes::BadRequest, 
+                                createErrorResponse(id, -32601, "Method not found"));
+                        }
+                    } catch (const std::exception& e) {
+                        request.reply(status_codes::InternalError);
+                    }
+                });
+            });
+        }
+    
+        void start() {
+            try {
+                listener.open().wait();
+                std::cout << "Server is running on " << base_url << std::endl;
+            } catch (const std::exception& e) {
+                std::cerr << "Error starting server: " << e.what() << std::endl;
+            }
+        }
+    };
+    
+    int main() {
+        PrivacyServer server("http://localhost:3000");
+        server.start();
+        
+        std::cout << "Press Enter to exit..." << std::endl;
+        std::cin.get();
+        return 0;
+    }
+
+
 int main() {
-    // Start the Stable Diffusion API server in a separate thread
+    // Start the API server (with MCP endpoint) in a separate thread
     std::thread server_thread(start_api_server);
 
     // Wait briefly to ensure server starts
@@ -145,24 +332,43 @@ int main() {
 
     std::cout << "PrivacyHttpSdk Version: " << PRIVACY_HTTP_SDK_VERSION << std::endl;
 
-    // Existing GET/POST requests (corrected typos and consolidated)
+    // Test the MCP endpoint
+    try {
+        std::string mcp_url = "http://127.0.0.1:8080/mcp";
+        std::unordered_map<std::string, std::string> headers = {
+            {"Content-Type", "application/json"}
+        };
+        json mcp_message = {
+            {"message_type", "command"},
+            {"sender", "test_client"},
+            {"payload", {
+                {"action", "test_action"},
+                {"data", "test_data"}
+            }}
+        };
+        std::string mcp_body = mcp_message.dump();
+        auto mcp_response = client->post(mcp_url, headers, mcp_body);
+        std::cout << "MCP Response: " << mcp_response << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "MCP Error: " << e.what() << std::endl;
+    }
+
+    // Existing GET/POST requests (unchanged)
     std::unordered_map<std::string, std::string> headers = {
         {"Authorization", "Bearer YOUR_API_KEY"},
         {"Content-Type", "application/json"}
     };
-
-    // Perform GET requests
     std::vector<std::string> urls = {
         "https://api.openai.com/v1/models",
-        "https://api.gemini.google.com/v1/models", // Corrected URL
+        "https://api.gemini.google.com/v1/models",
         "https://api.deepseek.com",
-        "https://bedrock-runtime.us-east-1.amazonaws.com", // Specified region
+        "https://bedrock-runtime.us-east-1.amazonaws.com",
         "https://api.x.ai/v1/models",
+        "https://api.x.ai/v1", // Grok 3 API
         "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
-        "https://api.anthropic.com/v1/messages", // Corrected Claude URL
-        "http://localhost:11434/api/generate" // Ollama local API
+        "https://api.anthropic.com/v1/messages",
+        "http://localhost:11434/api/generate"
     };
-
     for (const auto& url : urls) {
         try {
             auto response = client->get(url, headers);
@@ -171,8 +377,6 @@ int main() {
             std::cerr << "GET Error from " << url << ": " << e.what() << std::endl;
         }
     }
-
-    // Perform a POST request (example)
     try {
         std::string body = R"({"prompt": "Hello, world!", "max_tokens": 5})";
         auto response = client->post("https://api.openai.com/v1/completions", headers, body);
@@ -181,7 +385,7 @@ int main() {
         std::cerr << "POST Error: " << e.what() << std::endl;
     }
 
-    // Perform Stable Diffusion image generation
+    // Perform Stable Diffusion image generation (unchanged)
     try {
         privacy_http_sdk::generate_image(*client, "A serene landscape", 512, 512, 50, "output.png");
         std::cout << "Image saved to output.png" << std::endl;
@@ -189,7 +393,6 @@ int main() {
         std::cerr << "Stable Diffusion Error: " << e.what() << std::endl;
     }
 
-    // Keep the program running
     server_thread.join();
     return 0;
 }

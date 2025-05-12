@@ -7,9 +7,42 @@ const OpenAI = require ('openai');
 const { BedrockRuntimeClient } = require("@aws-sdk/client-bedrock-runtime");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const axios = require('axios');
+const { McpServer, ResourceTemplate } = require("McpServer");
+const { StdioServerTransport } = require("McpServer");
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Create an MCP server
+const server = new McpServer({
+  name: "Demo",
+  version: "1.0.0"
+});
+
+// Add an addition tool
+server.tool("add",
+  { a: z.number(), b: z.number() },
+  async ({ a, b }) => ({
+    content: [{ type: "text", text: String(a + b) }]
+  })
+);
+
+// Add a dynamic greeting resource
+server.resource(
+  "greeting",
+  new ResourceTemplate("greeting://{name}", { list: undefined }),
+  async (uri, { name }) => ({
+    contents: [{
+      uri: uri.href,
+      text: `Hello, ${name}!`
+    }]
+  })
+);
+
+// Start receiving messages on stdin and sending messages on stdout
+const transport = new StdioServerTransport();
+await server.connect(transport);
 
 // Middleware: Set secure HTTP headers using Helmet
 app.use(helmet());
@@ -60,6 +93,57 @@ app.get('/api/ai', async (req, res) => {
         console.error('Error calling AI API:', error);
         res.status(500).json({ error: 'Failed to fetch data from AI API' });
     }
+});
+
+// A2A AgentCard
+const agentCard = {
+  name: "PrivacyServerJS",
+  description: "Privacy-focused HTTP server with A2A support",
+  url: "http://localhost:3000",
+  version: "1.0.0",
+  capabilities: {
+    streaming: false,
+    pushNotifications: false,
+    stateTransitionHistory: false
+  }
+};
+
+// A2A AgentCard endpoint
+app.get('/.well-known/agent.json', (req, res) => {
+  res.json(agentCard);
+});
+
+// A2A tasks/send endpoint (JSON-RPC)
+app.post('/', (req, res) => {
+  const { jsonrpc, id, method, params } = req.body;
+  if (jsonrpc !== '2.0' || !id || !method || !params) {
+    return res.status(400).json({ jsonrpc: '2.0', error: { code: -32600, message: 'Invalid Request' }, id });
+  }
+  if (method === 'tasks/send') {
+    const { message } = params;
+    const text = message?.parts?.[0]?.text || 'No text provided';
+    const response = {
+      jsonrpc: '2.0',
+      id,
+      result: {
+        id: params.id || 'task-' + Date.now(),
+        status: { state: 'completed', timestamp: new Date().toISOString() },
+        artifacts: [{ parts: [{ type: 'text', text: `Processed: ${text}` }], index: 0 }]
+      }
+    };
+    return res.json(response);
+  }
+  res.status(400).json({ jsonrpc: '2.0', error: { code: -32601, message: 'Method not found' }, id });
+});
+
+// Basic HTTP endpoint
+app.get('/', (req, res) => {
+  res.json({ message: 'Privacy-focused HTTP server with A2A support' });
+});
+
+// Start server
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
 
 // Start server
