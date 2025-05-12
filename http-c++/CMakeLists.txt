@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.15)
-project(PrivacyHttpSdk VERSION 1.0.4-beta) # Define the version here
+project(PrivacyHttpSdk VERSION 1.0.4)  # Valid version format
+
+# Optional: Define the full version string separately
+set(PROJECT_VERSION "1.0.4-beta")
 
 # Add Rust shared library
 set(RUST_LIB_PATH "../privacy_http_sdk/target/release")
-set(RUST_LIB "${RUST_LIB_PATH}/libprivacy_http_sdk.so") # Adjust extension based on OS
+set(RUST_LIB "${RUST_LIB_PATH}/libprivacy_http_sdk.so")  # Adjust extension based on OS
 
 # Add include path for cxx auto-generated headers
 include_directories("../privacy_http_sdk/src")
