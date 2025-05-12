@@ -1,13 +1,13 @@
 name: Build C++ Module
 
 on:
-  workflow_dispatch:  # Allows manual triggering of the workflow
+  workflow_dispatch:
   push:
     paths:
-      - '**/*'  # Temporarily simplify to trigger for any file changes
+      - '**/*'
   pull_request:
     paths:
-      - '**/*'  # Temporarily simplify to trigger for any file changes
+      - '**/*'
 
 jobs:
   build:
@@ -19,6 +19,9 @@ jobs:
 
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y cmake build-essential
+
+      - name: List files in http-c++ directory (for debugging)
+        run: ls -R http-c++
 
       - name: Create build directory and configure CMake
         run: |
