@@ -13,8 +13,7 @@ app.py
 lib.rs
 main.cpp
 CMakeLists.txt
-CMakeLists.tx
-version.h.in.cpp
+version.h.in
 node_modules/
 packge-lock.json
 .vscode/
@@ -23,3 +22,6 @@ setup.py
 app.py
 setup.sh
 http-run.md
+rust.yml
+c-ccp.yml
+python-packge.yml
