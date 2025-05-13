@@ -15,10 +15,10 @@ fn main() {
 
     if header_src.exists() {
         fs::copy(&header_src, &header_dst)
-            .expect("Falha ao copiar lib.rs.h para src/");
-        println!("cargo:warning=lib.rs.h copiado com sucesso!");
+            .expect("Fail to the copy lib.rs.h for src/");
+        println!("cargo:warning=lib.rs.h copied with sucess!");
     } else {
-        panic!("Arquivo lib.rs.h não foi gerado!");
+        panic!("Achive lib.rs.h not was generated!");
     }
 
     println!("cargo:rerun-if-changed=src/lib.rs");
