@@ -301,3 +301,14 @@ fn http_client_module(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResultType<
     m.add_class::<HttpClientPy>()?;
     Ok(())
 }
+#[cxx::bridge]
+mod ffi {
+    extern "Rust" {
+        // Functions here
+        pub(crate) fn my_function_from_rust() -> String;
+    }
+}
+
+fn my_function_from_rust() -> String {
+    "Hello from Rust!".to_string()
+}
