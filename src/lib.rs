@@ -302,3 +302,13 @@ fn http_client_module(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResultType<
     m.add_class::<HttpClientPy>()?;
     Ok(())
 }
+
+#[cxx::bridge]
+mod ffi {
+    #[allow(dead_code)]
+    unsafe extern "C++" {
+        include!("lib.rs.h");
+
+        fn greet(name: &str) -> String;
+    }
+}
