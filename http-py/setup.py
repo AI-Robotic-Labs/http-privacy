@@ -13,7 +13,7 @@ setup(
         "qwen-agent==0.0.24",
         "llama-cpp-python==0.3.9",
         "openai==1.79.0",
-        "boto3==1.38.18",
+        "boto3==1.38.19",
     ],
     author="AI & Robotic Labs",  # Fixed: Closed quotation
     description="HTTP Privacy JS Bindings",
