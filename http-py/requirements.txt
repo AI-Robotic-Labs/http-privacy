@@ -6,4 +6,4 @@ llama-cpp-python==0.3.9
 openai==1.82.0
 google-generativeai ==0.8.5 
 mcp==1.9.1
-boto3==1.38.22
+boto3==1.38.23
