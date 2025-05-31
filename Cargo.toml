@@ -31,8 +31,6 @@ cxx-build = "1.0.158"
 [lib]
 # Make this library compatible with C++
 crate-type = ["cdylib"]
-name = "privacy_http_sdk"
-path = "src/lib"
 
 [features]
 default = []
