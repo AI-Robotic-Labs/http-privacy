@@ -29,7 +29,8 @@ mcp_rust_schema = "0.1.4"
 cxx-build = "1.0.158"
 
 [lib]
-# Make this library compatible with C++
+name = "privacy_http_sdk"
+path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [features]
