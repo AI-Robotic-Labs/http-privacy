@@ -29,8 +29,6 @@ mcp_rust_schema = "0.1.4"
 cxx-build = "1.0.158"
 
 [lib]
-name = "privacy_http_sdk"
-path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [features]
