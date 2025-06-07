@@ -7,6 +7,11 @@ use pyo3::types::PyModule;
 use pyo3::{Python, PyResult as PyResultType, Bound};
 use serde_json::json;
 use base64::Engine;
+
+
+pub fn hello() -> &'static str {
+    "Hello from privacy_http_sdk"
+}
 // HttpClient for Rust/WASM usage
 #[wasm_bindgen]
 #[derive(Debug)]

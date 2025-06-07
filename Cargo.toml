@@ -5,7 +5,7 @@ homepage = "https://github.com/AI-Robotic-Labs/http-privacy"
 documentation = "https://docs.rs/privacy_http_sdk"
 license = "MIT"
 version = "1.0.4-beta"
-edition = "2018"
+edition = "2024"
 
 [dependencies]
 reqwest = { version = "0.12.12", features = ["json", "native-tls"] }
@@ -29,7 +29,8 @@ mcp_rust_schema = "0.1.4"
 cxx-build = "1.0.158"
 
 [lib]
-crate-type = ["cdylib"]
+name = "privacy_http_sdk"
+crate-type = ["cdylib",  "rlib"]
 
 [features]
 default = []
