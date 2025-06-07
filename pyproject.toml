@@ -22,7 +22,7 @@ dependencies = [
     "user_agent==0.1.10",
     "openai==1.84.0",
     "google-generativeai==0.8.5",
-    "mcp==1.9.2",
+    "mcp==1.9.3",
     "qwen-agent==0.0.26",
     "llama-cpp-python==0.3.9",
     "boto3==1.38.30",
