@@ -9,6 +9,9 @@ string(REGEX MATCH "^([0-9]+)" PROJECT_VERSION_MAJOR ${PROJECT_VERSION})
 string(REGEX MATCH "\\.([0-9]+)" PROJECT_VERSION_MINOR ${PROJECT_VERSION})
 string(REGEX MATCH "\\.([0-9]+)[^0-9]" PROJECT_VERSION_PATCH ${PROJECT_VERSION})
 
+# description
+set(PROJECT_DESCRIPTION "Privacy HTTP SDK for C++")
+
 # Optionally, you can define a custom suffix for beta/alpha versions
 set(PROJECT_VERSION_SUFFIX "beta")
 
