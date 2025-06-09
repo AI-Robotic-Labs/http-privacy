@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
-project(PrivacyHttpSdk VERSION 1.0.4)  # Use a valid version number (no hyphen)
+project(PrivacyHttpSdk VERSION 1.0.5)  # Use a valid version number (no hyphen)
 
 # Define the full version string (including the 'beta' part)
-set(PROJECT_VERSION "1.0.4-beta")
+set(PROJECT_VERSION "1.0.5-beta")
 
 # Split the version into major, minor, and patch components
 string(REGEX MATCH "^([0-9]+)" PROJECT_VERSION_MAJOR ${PROJECT_VERSION})

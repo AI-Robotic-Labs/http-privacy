@@ -1,6 +1,6 @@
 {
   "name": "http-privacy-js",
-  "version": "1.0.4-beta",
+  "version": "1.0.5-beta",
   "description": "HTTP Privacy SDK for Javascript",
   "main": "index.js",
   "scripts": {
