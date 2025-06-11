@@ -8,7 +8,6 @@ use pyo3::{Python, PyResult as PyResultType, Bound};
 use serde_json::json;
 use base64::Engine;
 
-}
 // HttpClient for Rust/WASM usage
 #[wasm_bindgen]
 #[derive(Debug)]
