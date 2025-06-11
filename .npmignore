@@ -23,6 +23,6 @@ app.py
 setup.sh
 http-run.md
 rust.yml
-c-ccp.yml
+codeql.yml
 python-packge.yml
 cxx_bridge.rs
