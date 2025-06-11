@@ -46,7 +46,7 @@ pub struct HttpClient {
     #[allow(dead_code)]
     ollama_api_key: String,
     #[allow(dead_code)]
-    a2_a_sever: String,
+    a2_a_server: String,
     #[allow(dead_code)]
     request: String,
     #[allow(dead_code)]
@@ -82,7 +82,7 @@ impl HttpClient {
             deepseek_client,
             qwen_api_key: api_key.clone(),
             qwen_client,
-            a2_a_sever: String::new(),
+            a2_a_server: String::new(),
             deepseek_api_key: api_key.clone(),
             s3_client: Client::new(),
             xai_api_key: api_key.clone(),
