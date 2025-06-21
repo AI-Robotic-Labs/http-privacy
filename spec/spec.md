@@ -126,8 +126,7 @@ The goal is to let developers implement custom Rust clients/libraries while conf
 
 ## 📄 License
 
-MIT (or compatible with the project license)
-
+MIT 
 ---
 
 ## 🤝 Contributing
