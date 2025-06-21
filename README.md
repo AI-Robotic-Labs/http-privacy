@@ -21,3 +21,7 @@ You can use AI APIs (OpenAI, Claude, xAI...) and others for get privacy using HT
 ## Documentation
 
 [Docs](https://github.com/AI-Robotic-Labs/http-privacy/tree/main/doc)
+
+## Spec
+
+[Spec](https://github.com/AI-Robotic-Labs/http-privacy/blob/main/spec/spec.md)
