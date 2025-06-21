@@ -1,5 +1,3 @@
-### HTTP Privacy Specification
-
 ```markdown
 # HTTP Privacy Specification
 
