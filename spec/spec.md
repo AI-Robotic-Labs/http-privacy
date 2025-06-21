@@ -1,4 +1,3 @@
-```markdown
 # HTTP Privacy Specification
 
 **Repository**: [AI-Robotic-Labs/http-privacy](https://github.com/AI-Robotic-Labs/http-privacy)  
