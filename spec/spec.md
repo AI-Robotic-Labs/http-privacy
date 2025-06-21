@@ -137,14 +137,3 @@ MIT (or compatible with the project license)
 * No central SDK: freedom to innovate within spec
 
 ---
-
-## 📚 Related Projects
-
-* [privacy-proxy-rs](https://github.com/) (example of proxy implementation)
-* [rust-anon-client](https://github.com/) (client with masking)
-
----
-
-This specification is a living document. Updates will be published via tagged releases and community proposals.
-
-```
