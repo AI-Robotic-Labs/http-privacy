@@ -20,8 +20,12 @@ You can use AI APIs (OpenAI, Claude, xAI...) and others for get privacy using HT
 
 ## Documentation
 
+Documentation about how to run HTTP server locally
+
 [Docs](https://github.com/AI-Robotic-Labs/http-privacy/tree/main/doc)
 
 ## Spec
+
+Spec about protocol and build external bindings
 
 [Spec](https://github.com/AI-Robotic-Labs/http-privacy/blob/main/spec/spec.md)
