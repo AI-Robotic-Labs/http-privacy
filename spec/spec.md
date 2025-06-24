@@ -1,7 +1,3 @@
-Based on your provided Rust/PyO3/WASM hybrid client, here's an **updated and aligned HTTP Privacy Specification** that fits the architecture of your implementation. This also acts as a guide for others to create their own bindings that comply with the spec and reuse parts of your `HttpClient` infrastructure.
-
----
-
 # 🔐 HTTP Privacy Specification v1.1
 
 **Repository**: [AI-Robotic-Labs/http-privacy](https://github.com/AI-Robotic-Labs/http-privacy)
