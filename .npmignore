@@ -22,6 +22,7 @@ setup.py
 app.py
 setup.sh
 http-run.md
+spec.md
 rust.yml
 codeql.yml
 python-packge.yml
