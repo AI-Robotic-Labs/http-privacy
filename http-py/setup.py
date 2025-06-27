@@ -12,7 +12,7 @@ setup(
         "mcp==1.10.0"
         "qwen-agent==0.0.27",
         "llama-cpp-python==0.3.9",
-        "openai==1.91.0",
+        "openai==1.92.2",
         "boto3==1.38.45",
     ],
     author="AI & Robotic Labs",  # Fixed: Closed quotation
