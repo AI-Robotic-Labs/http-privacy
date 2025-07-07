@@ -282,18 +282,106 @@ maturin develop
 # or
 python3 setup.py develop
 ```
+### 🍏 Swift Integration Example (macOS / iOS)
+
+**Generate C Header:**
+
+```bash
+cbindgen --crate http_privacy --output include/http_privacy.h
+```
+
+**module.modulemap:**
+
+```modulemap
+module HttpPrivacy {
+  header "http_privacy.h"
+  export *
+}
+```
+
+**Swift Bridging Example:**
+
+```swift
+import HttpPrivacy
+
+let message = greet("Swift user")
+print(String(cString: message))
+```
 
 ---
 
-## 📦 Future: Swift, Kotlin/Native, Go
+### 🤖 Kotlin/Native Example (Multiplatform)
 
-For future native bindings:
+**Rust (lib.rs):**
 
-| Language | FFI Approach                                      |
-| -------- | ------------------------------------------------- |
-| Swift    | Use C header via `cbindgen`, wrap in `.modulemap` |
-| Kotlin   | Use `jni-rs` or generate `.so`/.dll FFI           |
-| Go       | Call Rust via cgo with `extern "C"`               |
+```rust
+#[no_mangle]
+pub extern "C" fn greet(name: *const c_char) -> *mut c_char {
+    let c_str = unsafe { CStr::from_ptr(name) };
+    let name_str = c_str.to_str().unwrap_or("unknown");
+    let result = format!("Hello, {name_str}");
+    CString::new(result).unwrap().into_raw()
+}
+```
+
+**Kotlin (using cinterop):**
+
+```kotlin
+fun main() {
+    val result = greet("Kotlin")
+    println(result?.toKString())
+}
+```
+
+> Use Gradle plugin `konan` for native interop.
+
+---
+
+### 🦫 Go Integration Example (CGO)
+
+**Rust (lib.rs):**
+
+```rust
+#[no_mangle]
+pub extern "C" fn greet(name: *const c_char) -> *const c_char {
+    let name = unsafe { CStr::from_ptr(name) }.to_str().unwrap_or("User");
+    CString::new(format!("Hello, {name}")).unwrap().into_raw()
+}
+```
+
+**Build as Shared Library:**
+
+```bash
+cargo build --release --target x86_64-unknown-linux-gnu
+```
+
+**Go Wrapper:**
+
+```go
+/*
+#cgo LDFLAGS: -L. -lhttp_privacy
+#include "http_privacy.h"
+*/
+import "C"
+import "fmt"
+
+func main() {
+    name := C.CString("Go User")
+    defer C.free(unsafe.Pointer(name))
+    msg := C.greet(name)
+    fmt.Println(C.GoString(msg))
+}
+```
+
+---
+
+By using these language bridges, you ensure full privacy-aware HTTP logic is **centralized in Rust** and reused across:
+
+* 🧠 iOS/macOS (Swift)
+* 📱 Android (Kotlin)
+* 🐹 Backend / CLI tools (Go)
+* 🌐 Web (WASM)
+* 🐍 Python
 
 ---
 
