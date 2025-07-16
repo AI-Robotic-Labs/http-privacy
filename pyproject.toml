@@ -25,7 +25,7 @@ dependencies = [
     "mcp==1.11.0",
     "qwen-agent==0.0.27",
     "llama-cpp-python==0.3.12",
-    "boto3==1.39.4",
+    "boto3==1.39.6",
 ]
 
 [project.scripts]
