@@ -2,7 +2,7 @@ Flask==3.1.1
 requests==2.32.4
 user_agent==0.1.10
 qwen-agent ==0.0.27
-llama-cpp-python==0.3.12 
+llama-cpp-python==0.3.13 
 openai==1.96.1
 google-generativeai ==0.8.5 
 mcp==1.11.0
