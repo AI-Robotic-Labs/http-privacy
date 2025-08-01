@@ -5,5 +5,5 @@ qwen-agent ==0.0.29
 llama-cpp-python==0.3.14 
 openai==1.98.0
 google-generativeai ==0.8.5 
-mcp==1.12.2
+mcp==1.12.3
 boto3==1.40.0
