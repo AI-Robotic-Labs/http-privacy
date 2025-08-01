@@ -4,9 +4,6 @@
 [![NPM version](https://img.shields.io/npm/v/http-privacy-js.svg)](https://www.npmjs.com/package/http-privacy-js)
 [![PyPI](https://img.shields.io/pypi/v/http-privacy-sdk.svg)](https://pypi.org/project/http-privacy-sdk)
 
-
-**Beta Version, use with caution for production**
-
 HTTP and AI for privacy APIs
 
 You can use AI APIs (OpenAI, Claude, xAI...) and others for get privacy using HTTP (REST/GET)
