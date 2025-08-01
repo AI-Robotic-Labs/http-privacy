@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "http-privacy-sdk"
-version = "1.0.0b6"
+version = "1.0.0"
 authors = [
   { name = "AI & Robotic Labs" },
 ]
