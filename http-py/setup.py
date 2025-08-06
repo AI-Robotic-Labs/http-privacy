@@ -14,6 +14,7 @@ setup(
         "llama-cpp-python==0.3.14",
         "openai==1.98.0",
         "boto3==1.40.1",
+        "xai-sdk==1.0.1"
     ],
     author="AI & Robotic Labs",  # Fixed: Closed quotation
     description="HTTP Privacy JS Bindings",
