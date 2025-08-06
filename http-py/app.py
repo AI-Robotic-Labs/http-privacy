@@ -14,6 +14,9 @@ import Prompt
 from python_a2a import A2AServer, skill, agent, run_server, TaskStatus, TaskState
 import agent
 from mcp.server.fastmcp import Context, FastMCP
+from xai_sdk import Client, AsyncClient
+from dotenv import load_dotenv
+
 app = Flask(__name__)
 
 # Initialize clients with proper separation
@@ -25,6 +28,8 @@ bedrock_client = boto3.client(
 xai_client = OpenAI(
     api_key=os.getenv("XAI_API_KEY", "<XAI API Key>"),  # Use env var or fallback to direct key
     base_url="https://api.x.ai/v1"
+     # sync_client = Client(api_key=api_key) # This line and the next one are commented out because they are not used and cause a syntax error
+    # async_client = AsyncClient(api_key=api_key)
 )
 
 qwen_client = OpenAI(
