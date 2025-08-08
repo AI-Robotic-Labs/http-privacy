@@ -25,7 +25,7 @@ dependencies = [
     "mcp==1.12.4",
     "qwen-agent==0.0.29",
     "llama-cpp-python==0.3.14",
-    "boto3==1.40.4",
+    "boto3==1.40.5",
     "xai-sdk==1.0.1"
 ]
 
