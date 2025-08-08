@@ -150,3 +150,13 @@ app.listen(PORT, () => {
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+// Prompt response effort
+
+const response = await openai.responses.create({
+  model: "gpt-5",
+  input: "How much gold would it take to coat the Statue of Liberty in a 1mm layer?",
+  reasoning: {
+    effort: "minimal"
+  }
+});

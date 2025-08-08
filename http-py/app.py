@@ -193,3 +193,11 @@ if __name__ == '__main__':
         ],
         stream=False
     )
+ # Prompt response effort
+    response = openai_client.chat.completions.create( # Changed client to openai_client
+        model="gpt-5",
+        messages=[{"role": "user", "content": "How much gold would it take to coat the Statue of Liberty in a 1mm layer?"}], # Changed input to messages
+        reasoning={
+            "effort": "minimal"
+        }
+    )
