@@ -11,7 +11,7 @@ setup(
         "google-generativeai==0.8.5",
         "mcp==1.13.0"
         "qwen-agent==0.0.29",
-        "llama-cpp-python==0.3.15",
+        "llama-cpp-python==0.3.16",
         "openai==1.99.9",
         "boto3==1.40.9",
         "xai-sdk==1.0.1"
