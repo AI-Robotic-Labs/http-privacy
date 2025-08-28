@@ -1,7 +1,7 @@
 [package]
 name = "privacy_http_sdk"
 description = "Privacy HTTP SDK for Rust"
-repository = "https://github.com/AI-Robotic-Labs/http-privacy"
+repository = "https://codeberg.org/Robot_Labs/http-privacy"
 documentation = "https://docs.rs/privacy_http_sdk"
 license = "MIT"
 version = "1.0.6"

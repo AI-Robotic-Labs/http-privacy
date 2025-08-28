@@ -20,7 +20,7 @@ setup(
     description="HTTP Privacy JS Bindings",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/AII-Robotic-Labs/http-privacy",
+    url="https://codeberg.org/Robot_Labs/http-privacy",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

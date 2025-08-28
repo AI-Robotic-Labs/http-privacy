@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AI-Robotic-Labs/http-privacy.git"
+    "url": "git+https://codeberg.org/Robot_Labs/http-privacy.git"
   },
   "keywords": [
     "ai",
