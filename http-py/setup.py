@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="http-privacy",
-    version="1.0.0",  # Fixed: Replaced '--' with '-'
+    version="1.0.1",  # Fixed: Replaced '--' with '-'
     packages=find_packages(),
     install_requires=[
         "Flask==3.1.2",    # Fixed: Properly formatted as a list of strings
