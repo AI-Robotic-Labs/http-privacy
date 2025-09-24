@@ -23,7 +23,7 @@ dependencies = [
     "openai==1.109.1",
     "google-generativeai==0.8.5",
     "mcp==1.14.1",
-    "qwen-agent==0.0.29",
+    "qwen-agent==0.0.30",
     "llama-cpp-python==0.3.16",
     "boto3==1.40.37",
     "xai-sdk==1.2.0"
