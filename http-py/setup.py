@@ -12,7 +12,7 @@ setup(
         "mcp==1.16.0"
         "qwen-agent==0.0.31",
         "llama-cpp-python==0.3.16",
-        "openai==2.1.0",
+        "openai==2.2.0",
         "boto3==1.40.45",
         "xai-sdk==1.2.0"
     ],
