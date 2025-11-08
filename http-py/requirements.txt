@@ -7,4 +7,4 @@ openai==2.7.1
 google-generativeai ==0.8.5 
 mcp==1.21.0
 boto3==1.40.68
-xai-sdk==1.3.1
+xai-sdk==1.4.0
