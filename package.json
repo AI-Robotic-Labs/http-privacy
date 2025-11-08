@@ -7,9 +7,9 @@
     "test": "node index.js"
   },
   "dependencies": {
-    "@aws-sdk/client-bedrock-runtime": "^3.922.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.927.0",
     "@google/generative-ai": "^0.24.1",
-    "@modelcontextprotocol/sdk": "^1.21.0",
+    "@modelcontextprotocol/sdk": "^1.21.1",
     "axios": "^1.13.2",
     "express": "^5.0.0",
     "helmet": "^8.1.0",
