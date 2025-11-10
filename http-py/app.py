@@ -25,6 +25,10 @@ bedrock_client = boto3.client(
     service_name="bedrock-runtime",
     region_name="<region>"  # Replace with actual region
 )
+moonshot_client = OpenAI(
+    api_key==os.getenv("MOONSHOT_API_KEY", "MOONSHOT_API_KEY>"),
+    base_url="https://api.moonshot.ai/v1"
+)
 xai_client = OpenAI(
     api_key=os.getenv("XAI_API_KEY", "<XAI API Key>"),  # Use env var or fallback to direct key
     base_url="https://api.x.ai/v1"

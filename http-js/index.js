@@ -55,6 +55,7 @@ app.get('/api/ai', async (req, res) => {
         
         // Example AI API request with the custom User-Agent header
         const aiApiUrl = 'https://api.x.ai/v1'; // Replace with your AI API URL
+        const MoonshootAPI= 'https://api.moonshot.ai/v1';
         const apiXai = 'https://api.x.ai/v1';
         const apiOpenai = 'https://api.openai.com/v1';
         const QwenAPI = 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions';
