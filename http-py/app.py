@@ -26,7 +26,7 @@ bedrock_client = boto3.client(
     region_name="<region>"  # Replace with actual region
 )
 moonshot_client = OpenAI(
-    api_key==os.getenv("MOONSHOT_API_KEY", "MOONSHOT_API_KEY>"),
+    api_key=os.getenv("MOONSHOT_API_KEY", "<MOONSHOT_API_KEY>"),
     base_url="https://api.moonshot.ai/v1"
 )
 xai_client = OpenAI(
