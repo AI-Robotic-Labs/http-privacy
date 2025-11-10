@@ -54,7 +54,9 @@ pub struct HttpClient {
     #[allow(dead_code)]
     mcp_server: String,
     #[allow(dead_code)]
-    base_url_:String
+    base_url_:String,
+    #[allow(dead_code)]
+    kimi_api_key: String
 }
 #[wasm_bindgen]
 impl HttpClient {
@@ -91,7 +93,8 @@ impl HttpClient {
             request: String::new(),
             response: String::new(),
             mcp_server: String::new(),
-            base_url_: String::new()
+            base_url_: String::new(),
+            kimi_api_key: String::new()
         }
     }
     pub fn get_sync(&self, url: &str, headers: JsValue) -> Result<String, JsValue> {
