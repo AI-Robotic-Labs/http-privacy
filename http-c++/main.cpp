@@ -364,12 +364,13 @@ int main() {
         "https://api.deepseek.com",
         "https://bedrock-runtime.us-east-1.amazonaws.com",
         "https://api.x.ai/v1/models",
-        "https://api.x.ai/v1", // Grok 3 API
+        "https://api.x.ai/v1",
         "https://api.anthropic.com/v1/models",
         "https://api.moonshot.ai/v1",
         "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
         "https://api.anthropic.com/v1/messages",
         "http://localhost:11434/api/generate"
+        "https://api.moonshot.ai/v1"
     };
     for (const auto& url : urls) {
         try {
