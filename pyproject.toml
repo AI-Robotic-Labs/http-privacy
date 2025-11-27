@@ -26,7 +26,7 @@ dependencies = [
     "qwen-agent==0.0.31",
     "llama-cpp-python==0.3.16",
     "boto3==1.41.4",
-    "xai-sdk==1.4.0"
+    "xai-sdk==1.4.1"
 ]
 
 [project.scripts]
