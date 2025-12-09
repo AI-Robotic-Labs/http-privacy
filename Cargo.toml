@@ -4,7 +4,7 @@ description = "Privacy HTTP SDK for Rust"
 repository = "https://codeberg.org/Robot_Labs/http-privacy"
 documentation = "https://docs.rs/privacy_http_sdk"
 license = "MIT"
-version = "1.0.7"
+version = "1.0.8"
 edition = "2024"
 
 [dependencies]
