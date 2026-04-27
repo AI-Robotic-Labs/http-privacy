@@ -6,7 +6,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "Flask==3.1.2",    # Fixed: Properly formatted as a list of strings
-        "requests==2.32.5",
+        "requests==2.33.0",
         "user_agent==0.1.14",
         "google-generativeai==0.8.6",
         "mcp==1.26.0"
