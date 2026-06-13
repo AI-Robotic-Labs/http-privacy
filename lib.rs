@@ -1,5 +1,7 @@
 use reqwest::blocking::Client;
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::Write;
 
 /// Core HttpClient providing privacy-focused HTTP operations.
 pub struct HttpClient {
@@ -50,6 +52,28 @@ impl HttpClient {
             .text()
             .map_err(|e| e.to_string())
     }
+
+    /// Generates an image via the local Stable Diffusion server and saves it to disk.
+    pub fn generate_image(&self, prompt: &str, width: i32, height: i32, steps: i32, output_path: &str) -> Result<(), String> {
+        let mut headers = HashMap::new();
+        headers.insert("Content-Type".to_string(), "application/json".to_string());
+        let body = format!(
+            r#"{{"prompt": "{}", "width": {}, "height": {}, "steps": {}}}"#,
+            prompt, width, height, steps
+        );
+        
+        let response = self.post("http://127.0.0.1:8080/txt2img", headers, &body)?;
+        
+        // Parse JSON response and decode image (requires serde_json and base64)
+        let v: serde_json::Value = serde_json::from_str(&response).map_err(|e| e.to_string())?;
+        let image_base64 = v["image"].as_str().ok_or("Missing image data")?;
+        
+        let bytes = base64::decode(image_base64).map_err(|e| e.to_string())?;
+        let mut file = File::create(output_path).map_err(|e| e.to_string())?;
+        file.write_all(&bytes).map_err(|e| e.to_string())?;
+        
+        Ok(())
+    }
 }
 
 // --- C++ Bindings (CXX) ---
@@ -67,6 +91,8 @@ mod ffi {
         fn get(self: &HttpClient, url: &str, headers: Vec<Header>) -> String;
         #[rust_name = "post_ffi"]
         fn post(self: &HttpClient, url: &str, headers: Vec<Header>, body: &str) -> String;
+        #[rust_name = "generate_image_ffi"]
+        fn generate_image(self: &HttpClient, prompt: &str, width: i32, height: i32, steps: i32, output_path: &str) -> String;
     }
 }
 
@@ -83,6 +109,11 @@ impl HttpClient {
     fn post_ffi(&self, url: &str, headers: Vec<ffi::Header>, body: &str) -> String {
         let map: HashMap<String, String> = headers.into_iter().map(|h| (h.key, h.value)).collect();
         self.post(url, map, body).unwrap_or_else(|e| format!("Error: {}", e))
+    }
+
+    fn generate_image_ffi(&self, prompt: &str, width: i32, height: i32, steps: i32, output_path: &str) -> String {
+        self.generate_image(prompt, width, height, steps, output_path)
+            .map(|_| "Success".to_string()).unwrap_or_else(|e| format!("Error: {}", e))
     }
 }
 
@@ -113,12 +144,7 @@ impl HttpClientPy {
     }
 
     fn generate_image(&self, prompt: &str, width: i32, height: i32, steps: i32, output_path: &str) -> PyResult<()> {
-        // Note: Actual image generation logic is typically handled by the local
-        // C++ Stable Diffusion server, which this client calls via POST.
-        let mut headers = HashMap::new();
-        headers.insert("Content-Type".to_string(), "application/json".to_string());
-        let body = format!(r#"{{"prompt": "{}", "width": {}, "height": {}, "steps": {}}}"#, prompt, width, height, steps);
-        self.client.post("http://127.0.0.1:8080/txt2img", headers, &body).map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e))?;
-        Ok(())
+        self.client.generate_image(prompt, width, height, steps, output_path)
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e))
     }
 }

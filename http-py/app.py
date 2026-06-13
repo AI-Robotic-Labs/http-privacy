@@ -29,12 +29,12 @@ moonshot_client = OpenAI(
     api_key=os.getenv("MOONSHOT_API_KEY", "<MOONSHOT_API_KEY>"),
     base_url="https://api.moonshot.ai/v1"
 )
+xai_api_key = os.getenv("XAI_API_KEY", "<XAI API Key>")
 xai_client = OpenAI(
-    api_key=os.getenv("XAI_API_KEY", "<XAI API Key>"),  # Use env var or fallback to direct key
+    api_key=xai_api_key,
     base_url="https://api.x.ai/v1"
-     # sync_client = Client(api_key=api_key) # This line and the next one are commented out because they are not used and cause a syntax error
-    # async_client = AsyncClient(api_key=api_key)
 )
+xai_sdk_client = Client(api_key=xai_api_key)
 
 qwen_client = OpenAI(
     api_key=os.getenv("Qwen_API_KEY"),
@@ -132,12 +132,9 @@ def call_ai_api():
             "User-Agent": generate_user_agent(),
             "Content-Type": "application/json",
         }
-        response = requests.post(api_url, headers=headers, data=processed_message)
-
-        if response.status_code != 200:
-            return jsonify({"error": f"API returned status {response.status_code}"}), response.status_code
-
-        return jsonify(response.json())
+        # Use privacy-aware Rust client for the POST request
+        response_text = privacy_client.post(api_url, headers, processed_message)
+        return jsonify(json.loads(response_text))
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": "Internal server error"}), 500

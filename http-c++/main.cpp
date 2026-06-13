@@ -142,38 +142,9 @@ void start_api_server() {
     svr.listen("127.0.0.1", 8080);
 }
 
-// Extend the privacy_http_sdk client interface (unchanged)
+// Extend the privacy_http_sdk client interface
 namespace privacy_http_sdk {
-    void generate_image(
-        HttpClient& client,
-        const std::string& prompt,
-        int width,
-        int height,
-        int steps,
-        const std::string& output_path
-    ) {
-        std::string url = "http://127.0.0.1:8080/txt2img";
-        std::unordered_map<std::string, std::string> headers = {
-            {"Content-Type", "application/json"}
-        };
-        json payload = {
-            {"prompt", prompt},
-            {"width", width},
-            {"height", height},
-            {"steps", steps}
-        };
-        std::string body = payload.dump();
-        std::string response = client.post(url, headers, body);
-        json response_json = json::parse(response);
-        std::string image_data = response_json["image"].get<std::string>();
-        std::string decoded = image_data; // TODO: Implement base64 decoding
-        std::ofstream file(output_path, std::ios::binary);
-        if (!file) {
-            throw std::runtime_error("Failed to open output file: " + output_path);
-        }
-        file.write(decoded.c_str(), decoded.size());
-        file.close();
-    }
+    // The generate_image logic is now centralized in Rust
 }
 
 // A2A Server
@@ -310,17 +281,13 @@ class PrivacyServer {
         }
     };
     
-    int main() {
+int main() {
+    // Start the A2A Privacy Server in a separate thread
+    std::thread a2a_thread([]() {
         PrivacyServer server("http://localhost:3000");
         server.start();
-        
-        std::cout << "Press Enter to exit..." << std::endl;
-        std::cin.get();
-        return 0;
-    }
+    });
 
-
-int main() {
     // Start the API server (with MCP endpoint) in a separate thread
     std::thread server_thread(start_api_server);
 
@@ -389,12 +356,13 @@ int main() {
 
     // Perform Stable Diffusion image generation (unchanged)
     try {
-        privacy_http_sdk::generate_image(*client, "A serene landscape", 512, 512, 50, "output.png");
+        client->generate_image("A serene landscape", 512, 512, 50, "output.png");
         std::cout << "Image saved to output.png" << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "Stable Diffusion Error: " << e.what() << std::endl;
     }
 
+    a2a_thread.detach();
     server_thread.join();
     return 0;
 }
