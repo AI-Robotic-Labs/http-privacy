@@ -64,6 +64,9 @@ mcp = FastMCP(
     api_key=os.getenv('MCP_API_KEY')
 )
 
+# Initialize the privacy-focused HTTP client from Rust bindings
+privacy_client = HttpClientPy.HttpClientPy()
+
 # Configure Gemini API with the API key from environment variables
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 # Define the Gemini model
