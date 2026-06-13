@@ -9,7 +9,7 @@ setup(
         "requests==2.34.2",
         "user_agent==0.1.14",
         "google-generativeai==0.8.6",
-        "mcp==1.26.0",
+        "mcp==1.27.2",
         "qwen-agent==0.0.34",
         "llama-cpp-python==0.3.28",
         "openai==2.41.1",
