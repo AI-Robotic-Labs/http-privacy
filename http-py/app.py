@@ -11,7 +11,7 @@ import requests
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import HttpClientPy
 import Prompt
-from python_a2a import A2AServer, skill, agent, run_server, TaskStatus, TaskState
+from python_a2a import A2AServer as A2AClient, skill, agent, run_server, TaskStatus, TaskState
 import agent
 from mcp.server.fastmcp import Context, FastMCP
 from xai_sdk import Client, AsyncClient
@@ -38,40 +38,31 @@ xai_client = OpenAI(
 
 qwen_client = OpenAI(
     api_key=os.getenv("Qwen_API_KEY"),
-    base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completion"
+    base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
 )
 
 claude_client = OpenAI(
     api_key=os.getenv("Claude_API_KEY"),
-    
     base_url="https://api.anthropic.com/v1/complete"
 )
 
 gemini_client = OpenAI(
     api_key=os.getenv("Gemini_API_KEY"),
-
-    base_url="https://generativelanguage.googleapis.com"
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
 ollama_client = OpenAI(
     api_key=os.getenv("Ollama_API_KEY"),
-    base_url="http://localhost:11434"
+    base_url="http://localhost:11434/v1"
 )
 
-A2AServer = A2AServer(
+a2a_server = A2AClient(
     api_key=os.getenv('A2A_API_KEY')
 )
 
 mcp = FastMCP(
     api_key=os.getenv('MCP_API_KEY')
 )
-
-# Initialize with Stability AI API key
-client = HttpClientPy ("your-stability-ai-api-key", "")
-
-# Generate image and save to file
-client.generate_image("A serene landscape", 512, 512, 50, "output.png")
-print("Image saved to output.png")
 
 # Configure Gemini API with the API key from environment variables
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
@@ -187,21 +178,3 @@ def xai_endpoint():
 if __name__ == '__main__':
     # Run Flask app
     app.run(debug=True, port=5000)
-    
-    # Example OpenAI API call (note: this won't run as it's after app.run())
-    response = openai_client.chat.completions.create(
-        model="deepseek-chat",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant"},
-            {"role": "user", "content": "Hello"},
-        ],
-        stream=False
-    )
- # Prompt response effort
-    response = openai_client.chat.completions.create( # Changed client to openai_client
-        model="gpt-5",
-        messages=[{"role": "user", "content": "How much gold would it take to coat the Statue of Liberty in a 1mm layer?"}], # Changed input to messages
-        reasoning={
-            "effort": "minimal"
-        }
-    )

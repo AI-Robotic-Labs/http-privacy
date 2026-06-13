@@ -61,12 +61,10 @@ app.get('/api/ai', async (req, res) => {
         const QwenAPI = 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions';
         const Claude = 'https://claude.ai/api/';
         const ollama = 'http://localhost:11434/api/generate';
-        const stable = new HttpClient("your-stability-ai-api-key");
-        const imageBase64 = client.generate_image_sync("A serene landscape", 512, 512, 50);
-        document.getElementById("image").src = `data:image/png;base64,${imageBase64}`;
+        const stabilityClient = new wasmModule.HttpClient("your-stability-ai-api-key");
+        const imageBase64 = stabilityClient.generate_image_sync("A serene landscape", 512, 512, 50);
         const genAI = new GoogleGenerativeAI(process.env.API_KEY);
         const inputData = { message: "Hello from WASM!" };
-        const client = new BedrockRuntimeClient({ region: "us-east-1" }); // Replace with your region
         // Optional: Perform preprocessing or data manipulation using WASM
         const processedData = wasmModule.process_message(JSON.stringify(inputData));
          
@@ -145,19 +143,4 @@ app.get('/', (req, res) => {
 // Start server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
-});
-
-// Start server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
-
-// Prompt response effort
-
-const response = await openai.responses.create({
-  model: "gpt-5",
-  input: "How much gold would it take to coat the Statue of Liberty in a 1mm layer?",
-  reasoning: {
-    effort: "minimal"
-  }
 });

@@ -369,8 +369,7 @@ int main() {
         "https://api.moonshot.ai/v1",
         "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
         "https://api.anthropic.com/v1/messages",
-        "http://localhost:11434/api/generate"
-        "https://api.moonshot.ai/v1"
+        "http://localhost:11434/v1"
     };
     for (const auto& url : urls) {
         try {
