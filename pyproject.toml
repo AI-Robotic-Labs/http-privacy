@@ -24,7 +24,7 @@ dependencies = [
     "google-generativeai==0.8.6",
     "mcp==1.27.2",
     "qwen-agent==0.0.34",
-    "llama-cpp-python==0.3.28",
+    "llama-cpp-python==0.3.29",
     "boto3==1.43.29",
     "xai-sdk==1.17.0"
 ]
