@@ -118,10 +118,10 @@ std::string RequestCanonicalizer::canonicalize(
     const std::vector<std::pair<std::string, std::string>>& headers,
     const std::string& body
 ) {
-    // Sort headers by key
+    // Sort headers by key stably
     auto sorted_headers = headers;
-    std::sort(sorted_headers.begin(), sorted_headers.end(),
-              [](const auto& a, const auto& b) { return a.first < b.first; });
+    std::stable_sort(sorted_headers.begin(), sorted_headers.end(),
+                     [](const auto& a, const auto& b) { return a.first < b.first; });
 
     // Build canonical string
     std::ostringstream oss;
