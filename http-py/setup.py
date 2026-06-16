@@ -13,7 +13,7 @@ setup(
         "qwen-agent==0.0.34",
         "llama-cpp-python==0.3.29",
         "openai==2.41.1",
-        "boto3==1.43.29",
+        "boto3==1.43.30",
         "xai-sdk==1.17.0"
     ],
     author="AI & Robotic Labs",  # Fixed: Closed quotation
