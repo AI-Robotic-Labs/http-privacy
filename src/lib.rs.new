@@ -1,0 +1,6 @@
+// Add this to the existing lib.rs file
+
+pub mod did_nostr;
+pub mod did_nostr_py;
+pub mod did_nostr_wasm;
+pub mod did_nostr_ffi;
