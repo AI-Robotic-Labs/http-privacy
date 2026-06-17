@@ -9,10 +9,34 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const axios = require('axios');
 const { McpServer, ResourceTemplate } = require("McpServer");
 const { StdioServerTransport } = require("McpServer");
+const { z } = require('zod');
 
 
 const app = express();
+app.use(express.json());
 const PORT = process.env.PORT || 3000;
+
+// DID-NOSTR Verification Helper
+const verifyNostrIdentity = (req) => {
+  const didHeader = req.headers['x-did'];
+  const signatureHeader = req.headers['x-signature'];
+
+  if (!didHeader || !signatureHeader) return { valid: false, error: "Missing DID or Signature headers" };
+
+  try {
+    const pubkey = wasmModule.JsNostrPublicKey.from_hex(didHeader.replace('did:nostr:', ''));
+    const signature = wasmModule.JsNostrSignature.from_hex(signatureHeader);
+    const canonical = wasmModule.JsRequestCanonicalizer.canonicalize(
+      req.method,
+      req.path,
+      Object.entries(req.headers),
+      JSON.stringify(req.body)
+    );
+    return wasmModule.JsNostrVerifier.verify(pubkey, canonical, signature);
+  } catch (e) {
+    return { valid: false, error: e.message };
+  }
+};
 
 // Create an MCP server
 const server = new McpServer({
@@ -41,8 +65,10 @@ server.resource(
 );
 
 // Start receiving messages on stdin and sending messages on stdout
-const transport = new StdioServerTransport();
-await server.connect(transport);
+(async () => {
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+})();
 
 // Middleware: Set secure HTTP headers using Helmet
 app.use(helmet());
@@ -115,6 +141,13 @@ app.get('/.well-known/agent.json', (req, res) => {
 // A2A tasks/send endpoint (JSON-RPC)
 app.post('/', (req, res) => {
   const { jsonrpc, id, method, params } = req.body;
+
+  // Verify DID-NOSTR Identity
+  const identity = verifyNostrIdentity(req);
+  if (!identity.valid && process.env.REQUIRE_DID === 'true') {
+    return res.status(401).json({ jsonrpc: '2.0', error: { code: -32000, message: 'Unauthorized: Invalid DID Signature' }, id });
+  }
+
   if (jsonrpc !== '2.0' || !id || !method || !params) {
     return res.status(400).json({ jsonrpc: '2.0', error: { code: -32600, message: 'Invalid Request' }, id });
   }
@@ -127,7 +160,7 @@ app.post('/', (req, res) => {
       result: {
         id: params.id || 'task-' + Date.now(),
         status: { state: 'completed', timestamp: new Date().toISOString() },
-        artifacts: [{ parts: [{ type: 'text', text: `Processed: ${text}` }], index: 0 }]
+        artifacts: [{ parts: [{ type: 'text', text: `Processed: ${text} (Verified DID: ${identity.did?.to_string() || 'None'})` }], index: 0 }]
       }
     };
     return res.json(response);
