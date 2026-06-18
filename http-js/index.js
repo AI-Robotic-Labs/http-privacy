@@ -11,6 +11,9 @@ const { McpServer, ResourceTemplate } = require("McpServer");
 const { StdioServerTransport } = require("McpServer");
 const { z } = require('zod');
 
+const rateLimit = require('express-rate-limit');
+ main
+
 
 const app = express();
 app.use(express.json());
@@ -72,6 +75,15 @@ server.resource(
 
 // Middleware: Set secure HTTP headers using Helmet
 app.use(helmet());
+
+// Configure rate limiter for the JSON-RPC endpoint
+const jsonRpcLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: { jsonrpc: '2.0', error: { code: -32009, message: 'Too many requests' } },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
 
 // Define route to call the AI API
 app.get('/api/ai', async (req, res) => {
@@ -138,8 +150,8 @@ app.get('/.well-known/agent.json', (req, res) => {
   res.json(agentCard);
 });
 
-// A2A tasks/send endpoint (JSON-RPC)
-app.post('/', (req, res) => {
+// A2A tasks/send endpoint (JSON-RPC) - with rate limiting
+app.post('/', jsonRpcLimiter, (req, res) => {
   const { jsonrpc, id, method, params } = req.body;
 
   // Verify DID-NOSTR Identity
