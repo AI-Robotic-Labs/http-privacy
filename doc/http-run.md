@@ -47,14 +47,8 @@ make
 
 ```bash
 curl http://localhost:8080
+curl http://localhost:3000/.well-known/agent.json
 ```
-
-### Configuration
-
-* **Port**: Edit `server.cpp`.
-* **HTTPS**: Provide `cert.pem` and `key.pem` in the project root and enable SSL in `server.cpp`.
-
----
 
 ## 🐍 Python Server (`http-py`)
 
@@ -144,7 +138,7 @@ npm install
 
 ```bash
 cd http-privacy/http-js
-node server.js
+node index.js
 ```
 
 ### Test
