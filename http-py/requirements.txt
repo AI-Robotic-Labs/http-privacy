@@ -3,7 +3,7 @@ requests==2.34.2
 user_agent==0.1.14
 qwen-agent ==0.0.34
 llama-cpp-python==0.3.35 
-openai==3.6.0
+openai==3.8.0
 google-generativeai ==0.8.6 
 mcp==2.1.1
 boto3==1.43.82
